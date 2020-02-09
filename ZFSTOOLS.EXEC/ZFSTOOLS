@@ -1,0 +1,4 @@
+        /* rexx */
+
+        address ispexec
+        "select panel(zfsmenu) newappl(isr) passlib"

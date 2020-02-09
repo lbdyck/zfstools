@@ -1,0 +1,28 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   ` type(text) intens(high) color(red)
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+)Body  Expand(\\)
+%-\-\-~zFS Backup%-\-\-
+%Command ===>_zcmd
+%
++ zFS to Backup:!zfsdsn                                        +
++ zFS Backup:   !zfsback                                       +
++    Replace:   !z+   Replace the backup dataset - Y or N
++
++ Notes:   1. The zFS to backup should be unmounted
++          2. The backup dataset name should not be a zFS as it is
++             a sequential IDCAMS Unload file
++          3. If the backup dataset exists and replace is specified
++             then it will be deleted prior to the backup
++          4. The backup dataset name may be a GDG
+)Init
+ .cursor = zfsdsn
+ .zvars = '(zreplace)'
+ if (&zreplace = &Z)
+    &zreplace = 'Y'
+)Proc
+  ver (&zfsdsn,nb,dsname)
+  ver (&zfsback,nb,dsname)
+  ver (&zreplace,nb,list,Y,N)
+)End

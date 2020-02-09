@@ -1,0 +1,25 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   $ type( input) intens(high) caps(off) just(left ) Pad('_')
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+)Body  Expand(\\)
+%-\-\-~zFS Mount%-\-\-
+%Command ===>_zcmd
+%
++ zFS to Mount:!zfsdsn                                        +
++ Mount Path:  $zfspath                                                      +
++ Read-Only:   !z+(Y/N)
++
++ Note: This command requires SuperUser capabilities
++
+)Init
+ .cursor = zfsdsn
+ .zvars = '(mntrorw)'
+ if (&mntrorw = &z)
+     &mntrorw = 'N'
+)Proc
+  ver (&zfsdsn,nb,dsnameq)
+  ver (&zfspath,nb)
+  ver (&mntrorw,nb,list,Y,N)
+)End

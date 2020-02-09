@@ -1,0 +1,46 @@
+)Attr Default(%+_)
+   $ type( input) intens(high) caps(on ) just(left )
+   ` type(text) intens(high) color(red)
+   ! type(text) intens(high) color(yellow)
+   ~ type(text) intens(high) color(turq  ) hilite(reverse)
+/* -------------------------- */
+/* zFSTools Menu for z/OS 2.2 */
+/* -------------------------- */
+)Body  Expand(\\)
+%-\-\-~zFS Tools%-\-\-
+%Option ===>_zcmd
+%
+ % 1`Backup   +Backup a zFS (Unload for backup purposes)
+ % 2`Restore  +Restore a zFS from an Unload dataset
+ % 3`Alloc+   +Allocate a zFS and Format it
+ % 4`Rename   +Rename a zFS
+ % 5`Mount    +Mount a zFS to a mount point!*
+ % 6`UnMount  +UnMount a zFS from a mount point
+ % 7`zfsadm   +zfsadm
+ % 8`Mount FS +IBM's Mount by File System!**
+ % 9`Mount MP +IBM's Mount by Mount Point!**
+ %10`zFSUse   +zFS Usage
+ %11`zLSOF    +List users of File Systems !**
+ %12`zFSCopy  +Generate ADRDSSU JCL to Copy a zFS
+ +
+ ! *`Indicates SuperUser Authority may be required for some or all
+    `part of the selection
+ !**`z/OS 2.2 or newer, currently &zos390rl
+)Init
+)Proc
+&ZSEL = TRANS (TRUNC (&ZCMD,'.')
+         1,'CMD(%zfsback)'
+         2,'CMD(%zfsrest)'
+         3,'CMD(%zfsalloc)'
+         4,'CMD(%zfsrenam)'
+         5,'cmd(%zfsmnt)'
+         6,'CMD(%zfsumnt)'
+         7,'Panel(zfsadm)'
+         8,'cmd(%zfsibm fs1)'
+         9,'cmd(%zfsibm fs2)'
+        10,'panel(zfsuse)'
+        11,'cmd(%tsotrap %zlsof -su -v)'
+        12,'cmd(%zfscopy)'
+         ' ',' '
+         *,'?' )
+)End

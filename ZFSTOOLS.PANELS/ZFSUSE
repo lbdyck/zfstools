@@ -1,0 +1,30 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   $ type( input) intens(low ) caps(off) just(left ) Pad('_')
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+)Body  Expand(\\)
+%-\-\-~zFS Usage%-\-\-
+%Command ===>_zcmd
+%
++ Enter zFS Usage Options, or none for a complete report        +
++
+%  Percentage:$z +         Minimum percentage in use to display
++                          * Must be numeric
+%  String:    $z        +  Any string to limit the selection
++                          GROW for those with AGGRGROW
++                          LIB for those with LIB in the name
++
+% Browse or View Results:$zfsview +Browse or View
+)Init
+ .zvars = '(zfsp zfss)'
+ .cursor = zfsp
+  if (&zfsview = &z)
+    &zfsview = 'Browse'
+ VPUT (zfsview) Profile
+)Proc
+ ver (&zfsp,num)
+ &zfsview = trans(trunc(&zfsview,1) B,Browse V,View b,Browse v,View *,*)
+ ver (&zfsview,nb,list,Browse,View)
+ &zsel = 'cmd(%zfsuse &zfsp &zfss)'
+)End

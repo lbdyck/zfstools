@@ -1,0 +1,19 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+)Body  Expand(\\)
+%-\-\-~zFS Rename%-\-\-
+%Command ===>_zcmd
+%
++ Current zFS Dataset:!zfsdsn                                        +
++     New zFS Dataset:!nzfsdsn                                       +
++
++ Rename a zFS dataset. Both the base and the data will be renamed.
++
+)Init
+ .cursor = zfsdsn
+)Proc
+  ver (&zfsdsn,nb,dsname)
+  ver (&nzfsdsn,nb,dsname)
+)End

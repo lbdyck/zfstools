@@ -1,0 +1,38 @@
+)Attr Default(%+_)
+   $ type( input) intens(high) caps(on ) just(left )
+   ` type(text) intens(high) color(red)
+   ~ type(text) intens(high) color(blue) hilite(reverse)
+/* -------------------------- */
+/* zFSTools Menu for z/OS 2.2 */
+/* -------------------------- */
+)Body  Expand(\\)
+@z   %-\-\-~zFS 2.2 Menu%-\-\-
+%Option ===>_zcmd
+%
+ % 1`Backup   +Backup a zFS (Unload for backup purposes
+ % 2`Restore  +Restore a zFS from an Unload dataset
+ % 3`Alloc+   +Allocate a zFS and Format it
+ % 4`Rename   +Rename a zFS
+ % 5`Mount    +Mount a zFS to a mount point *
+ % 6`UnMount  +UnMount a zFS from a mount point
+ % 7`zfsadm   +zfsadm
+ % 8`Mount FS +IBM's Mount by File System
+ % 9`Mount MP +IBM's Mount by Mount Point
+ +
+ % *`Indicates SuperUser Authority may be required for some or all
+    `part of the selection
+)Init
+)Proc
+&ZSEL = TRANS (TRUNC (&ZCMD,'.')
+         1,'CMD(%zfsback)'
+         2,'CMD(%zfsrest)'
+         3,'CMD(%zfsalloc)'
+         4,'CMD(%zfsrenam)'
+         5,'cmd(%zfsmnt)'
+         6,'CMD(%zfsumnt)'
+         7,'Panel(zfsadm)'
+         8,'cmd(%zfsibm fs1)'
+         9,'cmd(%zfsibm fs2)'
+         ' ',' '
+         *,'?' )
+)End

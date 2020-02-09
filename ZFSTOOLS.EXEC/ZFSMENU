@@ -1,0 +1,2 @@
+/* rexx */
+Address ISPExec "Select Panel(zfsmenu) newappl(isr)"

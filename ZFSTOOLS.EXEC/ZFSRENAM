@@ -1,0 +1,83 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      zfsrenam                                        *
+ *                                                            *
+ * Function:  Rename a zFS dataset                            *
+ *                                                            *
+ * Syntax:    %zfsrenam                                       *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * History:                                                   *
+ *            05/21/16 - Correction for fully qualified dsns  *
+ *            05/18/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+
+ Address ISPExec
+ do forever
+    "Display Panel(zfsrenam)"
+    if rc > 4 then exit 0
+    call do_it
+    Address ISPExec
+    end
+
+/* --------------------------------------------- *
+ * Verify that the zFS exists and is not mounted *
+ * --------------------------------------------- */
+Do_It:
+ if sysdsn(zfsdsn) /= "OK" then do
+    zedsmsg = ''
+    zedlmsg = 'Error:' zfsdsn "does not exist or is mounted and" ,
+              "thus not available."
+    "Setmsg msg(isrz001)"
+    return
+    end
+
+ Address TSO
+
+/* -------------------------------------- *
+ * Get the base and data names from LISTC *
+ * -------------------------------------- */
+ call outtrap 't.'
+ "Listc ent("zfsdsn")"
+ call outtrap 'off'
+
+ parse value '' with base data
+ do i = 1 to t.0
+    if word(t.i,1) = 'CLUSTER' then
+       base = "'"word(t.i,words(t.i))"'"
+    if word(t.i,1) = 'DATA' then
+       data = "'"word(t.i,words(t.i))"'"
+    end
+
+ if left(nzfsdsn,1) = "'" then do
+    newdsn = substr(nzfsdsn,2,length(nzfsdsn)-2)
+    end
+    else do
+         if sysvar('syspref') /= '' then hlq = sysvar('syspref')
+                                    else hlq = sysvar('sysuid')
+         newdsn = hlq'.'nzfsdsn
+         end
+
+ call outtrap 't.'
+ c.2 = "Alter" base "NewName('"newdsn"')"
+ c.2
+ c.3 = "Alter" data "NewName('"newdsn".DATA')"
+ c.3
+ "listc ent("nzfsdsn")"
+ call outtrap 'off'
+
+ c.1 = 'Commands:'
+ c.4 = ' '
+ cn = 4
+ do i = 1 to t.0
+   cn = cn + 1
+   c.cn = t.i
+   end
+ c.0 = cn
+
+ Address ISPExec 'vget (zfsview)'
+ if zfsview = '' then zfsview = 'view'
+ CALL stemview zfsview,'c.',,,"zFS Rename"
+
+ return

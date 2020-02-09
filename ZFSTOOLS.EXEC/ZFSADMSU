@@ -1,0 +1,28 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      ZFSADMSU                                        *
+ *                                                            *
+ * Function:  Display results of various ZFSADM authorzied    *
+ *            commands                                        *
+ *                                                            *
+ * Syntax:    %zfsadmsu option                                *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * History:                                                   *
+ *            05/16/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+ parse arg option
+ option = translate(option,"abcdefghijklmnopqrstuvwxyz", ,
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+ address syscall 'geteuid'
+ myeuid=retval
+ Address syscall "seteuid 0"
+ rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
+ rc = syscalls("OFF")
+ Address syscall "seteuid" myeuid
+ Address ISPExec 'vget (zfsview)'
+ if zfsview = '' then zfsview = 'Browse'
+    CALL stemview zfsview,'stdout.',,,"zfsadm" option
+ if stderr.0 > 0 then
+    CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option

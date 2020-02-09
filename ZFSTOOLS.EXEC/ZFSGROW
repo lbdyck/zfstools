@@ -1,0 +1,62 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      zfsgrow                                         *
+ *                                                            *
+ * Function:  Grow an existing zFS dataset                    *
+ *                                                            *
+ * Syntax:    %zfsgrow                                        *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * Notes:     This function requires the user have            *
+ *            SuperUser authority AND that the zFS            *
+ *            be mounted.                                     *
+ *                                                            *
+ * History:                                                   *
+ *            05/16/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+
+ Address ISPExec
+ do forever
+    "Display Panel(zfsgrow)"
+    if rc > 4 then exit 0
+    call do_it
+    Address ISPExec
+    end
+
+Do_It:
+/* ------------------------------------ *
+ * Verify that the requested zFS exists *
+ * ------------------------------------ */
+ if sysdsn(zfsdsn) /= "OK" then do
+    zedsmsg = ''
+    zedlmsg = 'Error:' zfsdsn "does not exist."
+    "Setmsg msg(isrz001)"
+    return
+    end
+
+ Address TSO
+ option = 'grow -aggregate' zfsdsn '-size' size
+ address syscall 'geteuid'
+ myeuid=retval
+ Address syscall "seteuid 0"
+ rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
+ rc = syscalls("OFF")
+ Address syscall "seteuid" myeuid
+ Address ISPExec 'vget (zfsview)'
+ if zfsview = '' then zfsview = 'Browse'
+    CALL stemview zfsview,'stdout.',,,"zfsadm" option
+ if stderr.0 > 0 then do
+    do i = 1 to stderr.0
+       stem.i = stderr.i
+       end
+    i = stderr.0 + 1
+    stem.i = 'The error may be because the zFS is NOT mounted.'
+    i = i + 1
+    stem.i = 'Verify that it is mounted and try again. Otherwise'
+    i = i + 1
+    stem.i = 'look up the error code and correct.'
+    stem.0 = i
+    CALL stemview zfsview,'stem.',,,"zfsadm error" option
+    end
+ Return

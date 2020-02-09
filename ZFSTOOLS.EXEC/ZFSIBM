@@ -1,0 +1,36 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      zfsIBM                                          *
+ *                                                            *
+ * Function:  IBM Mount dialog direct access                  *
+ *                                                            *
+ * Syntax:    %zfsibm parm                                    *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * Notes:     This function requires the user have            *
+ *            SuperUser authority                             *
+ *                                                            *
+ * History:                                                   *
+ *            05/19/16 - Check for z/OS 2.2 or higher         *
+ *            05/18/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+
+ arg parm
+
+ parse value mvsvar('sysmvs') with 'SP'level
+ if level < '7.2.2' then do
+    zedsmsg = ''
+    zedlmsg = 'This function is not supported on this level' ,
+              'of z/OS.  Requires 2.2 or higher.'
+    Address ISPExec 'Setmsg msg(isrz001)'
+    exit 4
+    end
+
+ Address TSO
+ address syscall 'geteuid'
+ myeuid=retval
+ Address syscall "seteuid 0"
+ Address ISPExec ,
+    'select pgm(isrrcl) parm('parm')'
+ Address syscall "seteuid" myeuid

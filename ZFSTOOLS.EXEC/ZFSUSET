@@ -1,0 +1,277 @@
+/*%NOCOMMENT====================* REXX *==============================*/
+/*  PURPOSE:  Display ZFS and HFS file usage report                   */
+/*--------------------------------------------------------------------*/
+/* FLG  YYMMDD  USERID   DESCRIPTION                                  */
+/* ---  ------  -------  -------------------------------------------- */
+/* @LT  180530  LBD      create a table view of the results           */
+/*                       add sort and find commands                   */
+/* @PG  160615  LBD      updates from Peter Giles                     */
+/* @LD  160520  LBD      syntax is fixed perc then string             */
+/* @LD  160520  LBD      Fix parm was not uppercased for string       */
+/* @LD  160520  LBD      Changed message to isrz001                   */
+/* @LD  160519  LBD      Changed to use Stemview to view the report   */
+/* @A2  160323  R2221    Removed checking ZSCTPREF variable for WFS   */
+/* @A1  130507  R2221    Check S.STFS_BLOCKSIZE is NUMeric            */
+/* @A0  110914  R2221    Installed REXX and chged SAYs to QUEUE       */
+/*====================================================================*/
+/**********************************************************************/
+/* Modifications:                                                     */
+/* U05 KCC 12/07/09 - added support for WFW 5-char sysnames.          */
+/* U04 KCC 04/09/08 - added code to support z/OS 1.9 chg to MNTE_MODE.*/
+/* U03 KCC 01/15/08 - added code to include PARM values, if any.      */
+/* U02 KCC 08/10/06 - added code to include mount attributes.         */
+/*                  - added code to support Not(^) prefix on string.  */
+/* U01 KCC 01/04/06 - original code.                                  */
+/*                                                                    */
+/* Syntax:  TSO ZFSUSE {percent} {string}                             */
+/* - Where either {percent} and/or {string} are optional and can be   */
+/*   specified in any order.                                          */
+/* - {percent} is an absolute integer representing usage percentage.  */
+/*   Only files with space utilization equal or greater are displayed.*/
+/* - {string} is a single unquoted case insensitive character string  */
+/*   found anywhere within the filesystem name, mountpoint, mount     */
+/*   mode, or parm values.                                            */
+/*                                                                    */
+/* Examples:                                                          */
+/*   TSO ZFSUSE read     <-- finds all FS's mounted READ or having    */
+/*                           "READ" anywhere in the FSname or mtpt.   */
+/*   TSO ZFSUSE lib.spp 90  <-- finds all LIB.SPP.** FS's using more  */
+/*                              than 90% of allocated space.          */
+/*   TSO ZFSUSE 90 lib.spp  <-- same output as previous command.      */
+/*   TSO ZFSUSE 85          <-- finds all FS's at 85% or more utiliz. */
+/*   TSO ZFSUSE aggrgrow    <-- finds all FS's using AGGRGROW parm.   */
+/**********************************************************************/
+  X        = MSG("OFF")
+  PANEL01  = "ZFSUSEM"                                          /* @A0 */
+  null     = ''                                                 /* @LT */
+
+  parse upper arg p1 p2 .
+  p1type = datatype(p1)
+  if p1=null then p1type='NULL'
+  p2type = datatype(p2)
+  if p2=null then p2type='NULL'
+  if p1type = p2type & p1type^='NULL' then do
+    ZEDSMSG = "Invalid parameter"                               /* A0 */
+    ZEDLMSG = "An invalid parameter was entered,",              /* A0 */
+      "the syntax is: ZFSUSE Ýpercent¨",                /* A0 */
+      "Ýstring¨"                                        /* A0 */
+    "ISPEXEC SETMSG MSG(isrz001)"                               /* A0 */
+    exit(0)
+  end
+
+  Call Set_Mode_Descriptions
+  percent=-1
+  string=null
+
+  Select
+    when (p1type='NULL') then nop
+    when (p1type='NUM') then percent=p1
+    otherwise do
+      ZEDSMSG = "Invalid parameter"                            /* A0 */
+      ZEDLMSG = "An invalid parameter was entered,",           /* A0 */
+        "the syntax is: ZFSUSE Ýpercent¨",             /* A0 */
+        "Ýstring¨"                                     /* A0 */
+      "ISPEXEC SETMSG MSG(isrz001)"                            /* A0 */
+      exit(0)
+    end
+  end
+
+  Select
+    when (p2type='NULL') then nop
+    when (p2type='CHAR') then string=p2
+    otherwise do
+      ZEDSMSG = "Invalid parameter"                            /* A0 */
+      ZEDLMSG = "An invalid parameter was entered,",           /* A0 */
+        "the syntax is: ZFSUSE Ýpercent¨",             /* A0 */
+        "Ýstring¨"                                     /* A0 */
+      "ISPEXEC SETMSG MSG(isrz001)"                            /* A0 */
+      exit(0)
+    end
+  end
+
+  Restart:
+  MSG1 = "    Obtaining info on ZFS/HFS files"
+  MSG2 = "      --- Please be patient ---"
+  CALL DISP_STATUS
+  call syscalls 'ON'
+  address syscall
+  numeric digits 12
+  "getmntent m."
+  Address ISPExec ,
+    'tbcreate zfsuse names(zuse zown zfs zmnt zatr zprm)' ,
+    "replace share nowrite"
+  l=0
+  do i=1 to m.0
+  parm = null
+    sysname=strip(m.mnte_sysname.i)
+    upper sysname
+    fsname=strip(m.mnte_fsname.i)
+    upper fsname
+    path=strip(m.mnte_path.i)
+    upper path
+    parm=strip(m.mnte_parm.i)
+    upper parm                                                  /* @LD */
+    mode=null
+    if m.mnte_mode.i > 255 then do
+ /* mode='SYNCHONLY ' */
+      m.mnte_mode.i = m.mnte_mode.i - 256
+    end
+    Call Translate_Mode_Settings m.mnte_mode.i
+    mode = mode||result
+    if string<>null then
+    do
+      if substr(string,1,1)='^' & length(string)>1 then
+      do
+        stringx = substr(string,2)
+        if pos(stringx,sysname)=0 & pos(stringx,fsname)=0 &,
+          pos(stringx,path)=0 & pos(stringx,mode)=0 &,
+          pos(stringx,parm)=0 then
+        call get_usage
+      end
+      else
+      do
+        if pos(string,sysname)>0 | pos(string,fsname)>0 |,
+          pos(string,path)>0 | pos(string,mode)>0 |,
+          pos(string,parm)>0 then
+        call get_usage
+      end
+    end
+    else
+    Call Get_Usage
+  end
+
+  Address ISPExec
+  'tbtop zfsuse'
+  'tbsort zfsuse fields(zuse,n,d)'
+  do forever
+    zsel = null
+    'tbdispl zfsuse panel(zfsusetb)'
+    if rc > 0 then leave
+    if zsel /= null then do
+       'SELECT PGM(ISRDSLST) PARM(UDL' zmnt')'
+       end
+    if zcmd /= '' then do
+       parse value zcmd with zcmd options
+       if abbrev("FIND",zcmd,1) = 1 then do
+          zedsmsg = null
+          if strip(options) = null then do
+             zedsmsg = 'Error.'
+             zedlmsg = 'Find requires a string to find...'
+             'Setmsg msg(isrz001)'
+             end
+          if zedsmsg = null then do
+             'tbtop zfsuse'
+             do forever
+                'tbskip zfsuse'
+                if rc > 0 then leave
+                if pos(options,translate(zmnt zfs)) = 0 then
+                   'tbdelete zfsuse'
+                end
+             end
+          end
+       if abbrev("REFRESH",zcmd,3) = 1 then do
+          'TBEnd zfsuse'
+          signal restart
+          end
+       if abbrev("SORT",zcmd,1) = 1 then do
+          parse value options with column order
+          if order = null then order = 'A'
+          if pos(order,'AD') = 0 then order = 'A'
+          type = 'C'
+          select
+            when abbrev('USE',column,1) = 1 then do
+                 column = 'zuse'
+                 type   = 'N'
+                 end
+            when abbrev('OWNER',column,1) = 1 then column = 'zown'
+            when abbrev('ATTRIBUTES',column,1) = 1 then column = 'zatr'
+            when abbrev('PARM',column,1) = 1 then column = 'zprm'
+            when abbrev('FILE_SYSTEM',column,1) = 1 then column = 'zfs'
+            when abbrev('MOUNT_POINT',column,1) = 1 then column = 'zmnt'
+            otherwise do
+                 column = 'zuse'
+                 type   = 'N'
+                 end
+            end
+          'tbsort zfsuse fields('column','type','order')'
+          end
+       end
+  end
+  'tbend zfsuse'
+
+  exit(0)
+
+Get_Usage:
+  statfs m.mnte_fsname.i s.
+  if (DATATYPE(S.STFS_BLOCKSIZE) = "NUM") THEN DO             /* @A1 */
+    j=s.stfs_total * s.stfs_blocksize
+    k=s.stfs_inuse * s.stfs_blocksize
+    p=trunc(k/j*100,2)
+  END                                                         /* @A1 */
+  if p>percent then
+  do
+    l=l+1
+    zuse = p
+    zown = m.mnte_sysname.i
+    zfs  = m.mnte_fsname.i
+    zmnt = m.mnte_path.i
+    zatr = mode
+    zprm = parm
+    Address ISPExec 'tbadd zfsuse'
+  end
+  return
+
+/*---------------------------------------------------------------------
+    Translate Mount Table Hex Mode Settings to Words
+---------------------------------------------------------------------*/
+Translate_Mode_Settings: procedure expose fsm.
+
+  arg mode
+  mode_in_hex = d2c(mode)
+  mode = null
+  do bit = 7 to 0 by -1
+    and_value = d2c(2**(7-bit))
+    bit_status = bitand(mode_in_hex,and_value) > '00'x
+    fsm.bit = fsm.bit.bit_status
+    if fsm.bit <> null then mode = mode||fsm.bit' '
+  end
+
+  return mode
+
+/*---------------------------------------------------------------------
+    Initialize Filesystem Mode Descriptions
+---------------------------------------------------------------------*/
+Set_Mode_Descriptions:
+
+  fsm. = null
+  fsm.0.0 = null
+  fsm.0.1 = 'SECACL'
+  fsm.1.0 = null
+  fsm.1.1 = 'UNMOUNT'
+  fsm.2.0 = null
+  fsm.2.1 = 'CLIENT'
+  fsm.3.0 = null
+  fsm.3.1 = 'NOAUTOMOVE'
+  fsm.4.0 = null
+  fsm.4.1 = 'NOSEC'
+  fsm.5.0 = null
+  fsm.5.1 = 'DFS-EXPORTED'
+  fsm.6.0 = null
+  fsm.6.1 = 'NOSETUID'
+  fsm.7.0 = 'RDWR'
+  fsm.7.1 = 'READ'
+
+  return 0
+/*--------------------------------------------------------------------*/
+/*   Display pop-up status panel                                 @A0  */
+/*--------------------------------------------------------------------*/
+DISP_STATUS:                                                  /* @A0 */
+                                                              /* @A0 */
+  ADDRESS ISPEXEC                                               /* @A0 */
+  "ADDPOP COLUMN(16) ROW(9)"                                  /* @A0 */
+  "CONTROL DISPLAY LOCK"                                      /* @A0 */
+  "DISPLAY PANEL("PANEL01")"                                  /* @A0 */
+  "REMPOP"                                                    /* @A0 */
+                                                              /* @A0 */
+  ADDRESS TSO                                                   /* @A0 */
+  RETURN                                                        /* @A0 */

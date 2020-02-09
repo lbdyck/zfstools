@@ -1,0 +1,22 @@
+)Attr Default(%+_)
+/* + type(text  ) intens(low )                   information only  */
+   ` type(output) intens(high)  caps(off) just(left ) color(yellow)
+   $ type( input) intens(high) caps(on ) just(left ) hilite(uscore)
+   ~ type(text) intens(high) color(blue ) hilite(reverse)
+)Body expand(\\)
+%-\-\-~zFS Aggregate Copy%-\-\-
+%Command ===>_zcmd
++
++Specify the From zFS:$fromzfs                                       +
++Specify the To   zFS:$tozfs                                         +
++
++Make sure:     1. The from zFS is NOT mounted
++               2. The to zFS does NOT exist
++
++Press Enter to continue or PF3 to cancel
+)Init
+ .cursor = fromzfs
+)Proc
+  ver (&fromzfs,dsnamepq)
+  ver (&tozfs,dsnamepq)
+)End

@@ -1,0 +1,49 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      ZFSADM                                          *
+ *                                                            *
+ * Function:  Display results of various ZFSADM queries       *
+ *                                                            *
+ * Syntax:    %zfsadm option                                  *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * History:                                                   *
+ *            05/19/16 - Check fsinfo for z/OS 2.2 or newer   *
+ *            05/16/16 - Add view option                      *
+ *            05/13/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+ parse arg option
+ option = translate(option,"abcdefghijklmnopqrstuvwxyz", ,
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+/* ------------------------------------- *
+ * Test for z/OS 2.2 or newer for fsinfo *
+ * ------------------------------------- */
+ zlt = 0
+ if pos('fsinfo',option) > 0 then zlt = 1
+ if pos('ctkc',option)   > 0 then zlt = 1
+ if pos('stkm',option)   > 0 then zlt = 1
+ if pos('sui',option)    > 0 then zlt = 1
+ if zlt = 1 then do
+    parse value mvsvar('sysmvs') with 'SP'level
+    if level < '7.2.2' then do
+       zedsmsg = ''
+       zedlmsg = 'This function is not supported on this level' ,
+                 'of z/OS.  Requires 2.2 or higher.'
+       Address ISPExec 'Setmsg msg(isrz001)'
+       exit 4
+       end
+    end
+
+/* ------------------------- *
+ * Invoke the zfsadm service *
+ * ------------------------- */
+ rc = syscalls("ON")
+ rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
+ rc = syscalls("OFF")
+ Address ISPExec 'vget (zfsview)'
+ if zfsview = '' then zfsview = 'Browse'
+ CALL stemview zfsview,'stdout.',,,"zfsadm" option
+ if stderr.0 > 0 then
+    CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option

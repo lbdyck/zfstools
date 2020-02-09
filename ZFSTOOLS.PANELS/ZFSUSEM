@@ -1,0 +1,8 @@
+)BODY WINDOW(40,4)
++
+% &MSG1
+% &MSG2
++
+)INIT
+  &ZWINTTL = &Z
+)END

@@ -1,0 +1,124 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      zfsback                                         *
+ *                                                            *
+ * Function:  Backup a zFS dataset using IDCAMS REPRO         *
+ *            to a sequential dataset.                        *
+ *                                                            *
+ * Syntax:    %zfsback                                        *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * Note:      If the zFS to be backed up is mounted then      *
+ *            it will appear as unavailable or not found.     *
+ *                                                            *
+ * History:                                                   *
+ *            05/19/16 - Support GDG output                   *
+ *            05/13/16 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+
+ Address ISPExec
+ do forever
+    "Display Panel(zfsback)"
+    if rc > 4 then exit 0
+    sback = zfsback
+    call do_it
+    zfsback = sback
+    Address ISPExec
+    end
+
+Do_It:
+/* --------------------------------------------- *
+ * Validate the source and target dataset status *
+ * --------------------------------------------- */
+ if sysdsn(zfsdsn) /= "OK" then do
+    zedsmsg = ''
+    zedlmsg = 'Error:' zfsdsn sysdsn(zfsdan)
+    "Setmsg msg(isrz001)"
+    return
+    end
+ if zreplace /= 'Y' then
+ if sysdsn(zfsback) = "OK" then do
+    zedsmsg = ''
+    zedlmsg = 'Error:' zfsback ,
+              "already exists and replace was not specified"
+    "Setmsg msg(isrz001)"
+    return
+    end
+
+ Address TSO
+/* ----------------------------------------------- *
+ * Get space allocation info for the backup target *
+ * ----------------------------------------------- */
+ call outtrap 't.'
+ "Listc ent("zfsdsn") all"
+ call outtrap 'off'
+ do i = 1 to t.0
+    Select
+      When pos('SPACE-TYPE',t.i) > 0 then
+        parse value translate(t.i,' ','-') with 'SPACE TYPE' stype .
+      When pos('SPACE-PRI',t.i) > 0 then
+        parse value translate(t.i,' ','-') with 'SPACE PRI' sprim .
+      When pos('SPACE-SEC',t.i) > 0 then
+        parse value translate(t.i,' ','-') with 'SPACE SEC' ssec .
+      Otherwise nop
+      end
+   end
+
+/* ------------------------------------ *
+ * Add support for a GDG output dataset *
+ * ------------------------------------ */
+ if pos('(+',zfsback) > 0 then do
+    parse value zfsback with zfsback'(' .
+    if left(zfsback,1) = "'" then zfsback = zfsback"'"
+    call outtrap 'c.'
+    'listc ent('zfsback')'
+    call outtrap 'off'
+    newgen = 0
+    do i = 1 to c.0
+       if word(c.i,1) = 'NONVSAM' then do
+          dsn = word(c.i,words(c.i))    /* get dsname */
+          gen = translate(dsn,' ','.')  /* drop .'s */
+          ndsn = subword(gen,1,words(gen)-1)
+          dsn = translate(ndsn,'.',' ')
+          gen = word(gen,words(gen))    /* get generation */
+          parse value gen with 'G'gen'V'version
+          if newgen < gen then newgen = gen
+          end
+       end
+       newgen = newgen + 1
+       zfsback = "'"dsn".G"right(newgen+10000,4)"V"version"'"
+    end
+
+/* ----------------------------------------------------- *
+ * test for zreplace and if the target backup dsn exists *
+ * ----------------------------------------------------- */
+ if sysdsn(zfsback) = 'OK' then
+    if zreplace = 'Y' then do
+       call outtrap 't.'
+       "Delete" zfsback
+       call outtrap 'off'
+       end
+
+/* ---------------------------------- *
+ * Allocate the backup unload dataset *
+ * ---------------------------------- */
+ if left(stype,1) = 'C' then stype = "CYL"
+ if left(stype,1) = 'T' then stype = "TRKS"
+ "Alloc ds("zfsback") new spa("sprim","ssec")" stype "Release" ,
+       "RECFM(F B) BLKSIZE(20480) LRECL(4096)"
+ "Free  ds("zfsback")"
+
+/* ------------------------------------ *
+ * Call REPRO to backup the zfs dataset *
+ * ------------------------------------ */
+ call outtrap 't.'
+ "Repro indataset("zfsdsn") outdataset("zfsback")"
+ reprc = rc
+ call outtrap 'off'
+ zedsmsg = ''
+ zedlmsg = left("Repro completed with a return code of:" reprc ,72) ,
+            t.1
+ Address ISPExec "Setmsg msg(isrz001)"
+
+ return

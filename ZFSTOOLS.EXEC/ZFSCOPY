@@ -1,0 +1,143 @@
+/* --------------------  rexx procedure  -------------------- *
+ | Name:      zFSCopy                                         |
+ |                                                            |
+ | Function:  Create JCL to copy a ZFS                        |
+ |                                                            |
+ | Syntax:    %zfscopy from_zfs to_zfs                        |
+ |                                                            |
+ |            If no parms then an ISPF panel will be          |
+ |            displayed                                       |
+ |                                                            |
+ | Usage Notes:                                               |
+ |            1. The from_zfs must be unmounted               |
+ |            2. The to_zfs must not exist                    |
+ |            3. ADRDSSU will be used to copy the zfs         |
+ |                                                            |
+ | Dependencies:                                              |
+ |            1. ADRDSSU                                      |
+ |            2. Stemedit will be used                        |
+ |            3. SYS1.SBPXEXEC(ZLSOF) must be in SYSEXEC      |
+ |               concatenation                                |
+ |                                                            |
+ | Author:    Lionel B. Dyck                                  |
+ |                                                            |
+ | History:  (most recent on top)                             |
+ |            10/31/16 - Update header to doc zlsof           |
+ |            10/12/16 - Creation                             |
+ |                                                            |
+ * ---------------------------------------------------------- */
+ arg options
+
+ parse value '' with null fromzfs tozfs ispf
+
+ if options = null then call ispf_prompt
+
+ if ispf = null then do
+    x = test_from()
+    if x = 8 then
+       say 'Error:' ,
+           'The From zFS is mounted and it must not be.' ,
+                 'Unmount and try again.'
+    if sysdsn(tozfs) /= 'OK'
+       then do
+          if x = 0 then leave
+          end
+       else say 'Error'
+                'The To zFS must not exist and it does.' ,
+                      'Either delete it or select a new name.'
+    end
+
+/* ---------------------------- *
+ | Fully qualify the zfs dsname |
+ * ---------------------------- */
+ if sysvar('syspref') = null then hlq = sysvar('sysuid')
+                             else hlq = sysvar('syspref')
+ if left(fromzfs,1) = "'"
+    then fromzfsw = substr(fromzfs,2,length(fromzfs)-2)
+    else fromzfsw = hlq'.'fromzfs
+ if left(tozfs,1) = "'"
+    then tozfsw = substr(tozfs,2,length(tozfs)-2)
+    else tozfsw = hlq'.'tozfs
+
+/* ------------- *
+ | Build the JCL |
+ * ------------- */
+ sysin.1  = '//'sysvar('sysuid') ' JOB ...'
+ sysin.2  = '//    NOTIFY='sysvar('sysuid')',REGION=0M,MSGCLASS=(1,1)'
+ sysin.3  = '//COPYZFS  EXEC PGM=ADRDSSU'
+ sysin.4  = '//SYSPRINT DD SYSOUT=*'
+ sysin.5  = '//SYSIN    DD *'
+ sysin.6  = ' COPY DATASET( - '
+ sysin.7  = '      INCLUDE('fromzfsw')) -'
+ sysin.8  = '      RENAMEU('fromzfsw', -'
+ sysin.9  = '              'tozfsw') -'
+ sysin.10 = '      CATALOG ALLDATA(*) ALLEXCP -'
+ sysin.11 = '      CANCELERROR TOLERATE(ENQF)'
+ sysin.12 = '/*'
+ sysin.0  = 12
+
+/* ----------------------------------------- *
+ | Invoke StemEdit to View the Generated JCL |
+ * ----------------------------------------- */
+ call stemedit 'View',sysin.,,,'Edit and Submit JCL',,80
+
+ Exit
+
+/* ------------------------------------------- *
+ | Display the ISPF Prompting panel and prompt |
+ | for the from and to zfs filenames.          |
+ |                                             |
+ | Then validate that:                         |
+ |                                             |
+ | 1. The from zfs is not currently mounted    |
+ | 2. The to zfs does not currently exist      |
+ * ------------------------------------------- */
+ ISPF_Prompt:
+ ispf = 1
+ if fromzfs = null then
+    parse value options with fromzfs tozfs zedsmsg
+ Address ISPExec
+ do forever
+    'Display Panel(zfscopy)'
+    if rc > 0 then exit
+    x = test_from()
+    if x = 4 then do
+       zedsmsg = 'Error'
+       zedlmsg = 'The From zFS does not exist.'
+       'setmsg msg(isrz001)'
+      end
+    if x = 8 then do
+       zedsmsg = 'Error'
+       zedlmsg = 'The From zFS is mounted and it must not be.' ,
+                 'Unmount and try again.'
+       'setmsg msg(isrz001)'
+      end
+    if x = 0 then
+    if sysdsn(tozfs) /= 'OK'
+       then do
+            Address TSO
+            return
+            end
+       else do
+            zedsmsg = 'Error'
+            zedlmsg = 'The To zFS must not exist and it does.' ,
+                      'Either delete it or select a new name.'
+            'setmsg msg(isrz001)'
+            end
+    end
+
+/* ----------------------------------------------- *
+ | Test the From_ZFS to make sure it isn't mounted |
+ * ----------------------------------------------- */
+ Test_From:
+ call outtrap 'trap.'
+ Address TSO '%zlsof -su'
+ call outtrap 'off'
+ if left(fromzfs,1) /= "'"
+    then fromzfsw = fromzfs
+    else fromzfsw = substr(fromzfs,2,length(fromzfs)-2)
+ do i = 1 to trap.0
+    if pos(fromzfsw,trap.i) > 0 then return 8
+    end
+ if sysdsn(fromzfs) /= 'OK' then return 4
+ return 0

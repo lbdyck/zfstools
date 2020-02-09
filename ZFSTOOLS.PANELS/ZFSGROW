@@ -1,0 +1,22 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+)Body  Expand(\\)
+%-\-\-~zFS Grow%-\-\-
+%Command ===>_zcmd
+%
++ zFS Dataset:!zfsdsn                                        +
++
++ Size:!size    +in Kilobytes after the grow operation
++                or 0 to use the Secondary Allocation value
++
+% Notes:        +1. The zFS%must+be mounted for grow to work
++                2. You%must+have SuperUser capabilities to use this
++
+)Init
+ .cursor = zfsdsn
+)Proc
+  ver (&zfsdsn,nb,dsname)
+  ver (&size,nb,num)
+)End

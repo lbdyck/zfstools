@@ -1,0 +1,20 @@
+)Attr Default(%+#)
+   ` type(output) intens(high) caps(off) just(left )
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   @ type(text) intens(high) color(turq)
+)Body  Expand(\\)
+%-\-\-~zFS Usage Tutorial%-\-\-
+%Command ===>#zcmd
+%
+%ZFSUSE ISPF Dialog Tutorial
+%
+%Commands:+   %Sort+column order
++                   order A for ascending or D for descending
+              %Find+string
++                   finds the string in either the ZFS or Mount Point
++                   - case insensitive
+%Select:+     %S+Select the File System to be displayed
+%
+)Init
+)Proc
+)End
