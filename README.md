@@ -54,21 +54,21 @@ Some of the REXX exec's included are:
  * ZFSGROW  - increase the size of a mounted zFS
 
    ZFSIBM   - exec to access some of the IBM zFS dialogs
-              - Mount Table by File System
-              - Mount Table by Mount Point
-              * not supported prior to z/OS 2.2
+            - Mount Table by File System
+            - Mount Table by Mount Point
+            * not supported prior to z/OS 2.2
 
    ZFSMENU  - Simple exec to display the ZFSTools Menu Panel
 
    ZFSMNT   - Mount a file system using the IBM Mount dialog
-              - if z/OS 2.1 then use custom dialog
+            - if z/OS 2.1 then use custom dialog
 
    ZFSRENAM - rename the zFS base and data datasets
 
    ZFSREST  - to restore a zFS unloaded dataset
             - uses IDCAMS REPRO
             - can create a new zFS
-            - can delete a current zFS before allocating a new
+            - can delete a current zFS before allocating a new 
               zFS and reloading
             - can restore from a gdg
 
