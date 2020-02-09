@@ -39,6 +39,7 @@ an allocated library in your SYSPROC or SYSEXEC concatenation.
 Some of the REXX exec's included are:
 
    ZFSADM   - perfrom several of the zfsadm functions
+
    ZFSALLOC - to allocate and format a new zFS (as a type 1.5)
    ZFSBACK  - to backup a zFS to a sequential dataset
               - uses IDCAMS REPRO
@@ -47,26 +48,36 @@ Some of the REXX exec's included are:
                 the code, using the sysdsn() function, gets a dataset
                 not found result. Strange but it does prevent an
                 attempt to backup an active zFS.
+
    ZFSCOPY  - Generate ADRDSSU JCL to copy a zFS
+
  * ZFSGROW  - increase the size of a mounted zFS
+
    ZFSIBM   - exec to access some of the IBM zFS dialogs
               - Mount Table by File System
               - Mount Table by Mount Point
               * not supported prior to z/OS 2.2
+
    ZFSMENU  - Simple exec to display the ZFSTools Menu Panel
+
    ZFSMNT   - Mount a file system using the IBM Mount dialog
               - if z/OS 2.1 then use custom dialog
+
    ZFSRENAM - rename the zFS base and data datasets
+
    ZFSREST  - to restore a zFS unloaded dataset
             - uses IDCAMS REPRO
             - can create a new zFS
             - can delete a current zFS before allocating a new
               zFS and reloading
             - can restore from a gdg
+
    ZFSTOOLS - exec to altlib and libdef for this application if you
               don't install in ispf allocated libraries
+
    ZFSUMNT  - UnMount using the IBM Mount Table by File System
               - if z/OS 2.1 then use custom dialog
+
    ZFSUSE   - Display information about zFS usage
 
    * - these functions require SU authority
