@@ -63,7 +63,7 @@ Do_It:
  if stderr.0 > 0 then
     CALL stemview zfsview,'stderr.',,,"zfsadm error" option
  if stdout.0 + stderr.0 = 0 then do
-    zedsmsg = "''
+    zedsmsg = ""
     zedlmsg = zfspath "was successfully unmounted."
     Address ISPExec "Setmsg msg(isrz001)"
     end

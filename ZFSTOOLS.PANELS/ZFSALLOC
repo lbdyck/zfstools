@@ -11,9 +11,9 @@
 + Space Allocation:
 +   Primary:  !palc+    Primary Space in Cylinders
 +   Secondary:!salc+    Secondary Space in Cylinders
-+   Dataclas: !dcls+    Dataclas
-+   Mgmtclas: !mcls+    Mgmtclas
-+   Storclas: !scls+    Storclas
++   Dataclas: !dcls    +Dataclas
++   Mgmtclas: !mcls    +Mgmtclas
++   Storclas: !scls    +Storclas
 +
 )Init
  .cursor = zfsdsn
