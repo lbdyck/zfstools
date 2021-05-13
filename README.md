@@ -68,9 +68,11 @@ Some of the REXX exec's included are:
    ZFSREST  - to restore a zFS unloaded dataset
             - uses IDCAMS REPRO
             - can create a new zFS
-            - can delete a current zFS before allocating a new 
+            - can delete a current zFS before allocating a new
               zFS and reloading
             - can restore from a gdg
+
+   ZFSSIZER - exec to prompt to size a zFS from a directory or by MB's
 
    ZFSTOOLS - exec to altlib and libdef for this application if you
               don't install in ispf allocated libraries

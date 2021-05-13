@@ -22,6 +22,7 @@
  %10`zFSUse   +zFS Usage
  %11`zLSOF    +List users of File Systems !**
  %12`zFSCopy  +Generate ADRDSSU JCL to Copy a zFS
+ %13`zFSSizer +Size a zFS dataset
  +
  ! *`Indicates SuperUser Authority may be required for some or all
     `part of the selection
@@ -41,6 +42,7 @@
         10,'panel(zfsuse)'
         11,'cmd(%tsotrap %zlsof -su -v)'
         12,'cmd(%zfscopy)'
+        13,'cmd(%zfssizer)'
          ' ',' '
          *,'?' )
 )End
