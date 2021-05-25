@@ -1,91 +1,86 @@
-/* --------------------  rexx procedure  -------------------- *
- * Name:      zfsalloc                                        *
- *                                                            *
- * Function:  Allocate and Format a new zFS dataset           *
- *                                                            *
- * Syntax:    %zfsalloc                                       *
- *                                                            *
- * Author:    Lionel B. Dyck                                  *
- *                                                            *
- * History:                                                   *
- *            08/06/18 - Bug fix for dataclass                *
- *            05/17/16 - Add Mgmt                             *
- *            05/16/16 - Add Dataclas and Storclas            *
- *            05/13/16 - Updated to discard usscmd and to     *
- *                       use bpxwunix                         *
- *            05/13/16 - Creation                             *
- *                                                            *
- * ---------------------------------------------------------- */
+  /* --------------------  rexx procedure  -------------------- *
+  * Name:      zfsalloc                                        *
+  *                                                            *
+  * Function:  Allocate and Format a new zFS dataset           *
+  *                                                            *
+  * Syntax:    %zfsalloc                                       *
+  *                                                            *
+  * Author:    Lionel B. Dyck                                  *
+  *                                                            *
+  * History:                                                   *
+  *            05/17/21 - Add volser option                    *
+  *            08/06/18 - Bug fix for dataclass                *
+  *            05/17/16 - Add Mgmt                             *
+  *            05/16/16 - Add Dataclas and Storclas            *
+  *            05/13/16 - Updated to discard usscmd and to     *
+  *                       use bpxwunix                         *
+  *            05/13/16 - Creation                             *
+  *                                                            *
+  * ---------------------------------------------------------- */
+  parse value '' with null
 
-/* ----------------------------------------------------- *
- * Define defaults and customized values                 *
- *                                                       *
- *   zfsvol may be defined to a volser but it            *
- *   will be over-ridden (or should be) by ACS routines. *
- *   if null then it will not be used in the allocation  *
- * ----------------------------------------------------- */
- zfsvol = ''          /* *custom */
- null   = ''
-
- Address ISPExec
- do forever
+  Address ISPExec
+  do forever
     "Display Panel(zfsalloc)"
     if rc > 4 then exit 0
     call do_it
     Address ISPExec
-    end
+  end
 
 Do_It:
-/* ---------------------------------------------------- *
- * Verify that the requested zFS does not already exist *
- * ---------------------------------------------------- */
- if sysdsn(zfsdsn) = "OK" then do
+  /* ---------------------------------------------------- *
+  * Verify that the requested zFS does not already exist *
+  * ---------------------------------------------------- */
+  if sysdsn(zfsdsn) = "OK" then do
     zedsmsg = ''
     zedlmsg = "Error:" zfsdsn ,
-              "already exists - specify a unique dataset name."
+      "already exists - specify a unique dataset name."
     "Setmsg msg(isrz001)"
     return
-    end
+  end
 
- Address TSO
+  Address TSO
 
-/* -------------- *
- * Define the zFS *
- * -------------- */
- stype = "CYLINDERS"
- parse value '' with dopt sopt mopt
- if dcls /= null then dopt = "Dataclas("dcls")"
- if mcls /= null then mopt = "Mgmtclas("mcls")"
- if scls /= null then sopt = "Storclas("scls")"
- call outtrap 't.'
- if zfsvol = null then vol = null
-                  else vol = 'vol('zfsvol')'
-say  "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
+  /* -------------- *
+  * Define the zFS *
+  * -------------- */
+  stype = "CYLINDERS"
+  parse value '' with dopt sopt mopt
+  if dcls /= null then dopt = "Dataclas("dcls")"
+  if mcls /= null then mopt = "Mgmtclas("mcls")"
+  if scls /= null then sopt = "Storclas("scls")"
+  call outtrap 't.'
+  if zfsvol = null then vol = null
+  else vol = 'vol('zfsvol')'
+  say  "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
     stype"("palc","salc")" vol
- "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
+  "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
     stype"("palc","salc")" vol
- call outtrap 'off'
+  drc = rc
+  call outtrap 'off'
 
-/* -------------------------- *
- * Now Format the zFS Dataset *
- * -------------------------- */
- if left(zfsdsn,1) = "'"
- then zfsdsnc = substr(zfsdsn,2,length(zfsdsn)-2)
- else do
-       if sysvar('syspref') = null
-          then zfsdsnc = zfsdsn
-          else zfsdsnc = sysvar('syspref')'.'zfsdsn
-      end
- rc = syscalls("ON")
- unixcmd = "zfsadm format -aggr" zfsdsnc "-version5"
- rc = bpxwunix(unixcmd,,stdout.,stderr.)
- reprc = rc
- rc = syscalls("OFF")
- Address ISPExec 'vget (zfsview)'
- if zfsview = '' then zfsview = 'Browse'
- if stdout.0 > 0 then
-    CALL stemview zfsview,'stdout.',,,"zfsadm" option
- if stderr.0 > 0 then
-    CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option
+  if drc > 0 then call stemedit 'view',t.
 
- return
+  /* -------------------------- *
+  * Now Format the zFS Dataset *
+  * -------------------------- */
+  if left(zfsdsn,1) = "'"
+  then zfsdsnc = substr(zfsdsn,2,length(zfsdsn)-2)
+  else do
+    if sysvar('syspref') = null
+    then zfsdsnc = zfsdsn
+    else zfsdsnc = sysvar('syspref')'.'zfsdsn
+  end
+  rc = syscalls("ON")
+  unixcmd = "zfsadm format -aggr" zfsdsnc "-version5"
+  rc = bpxwunix(unixcmd,,stdout.,stderr.)
+  reprc = rc
+  rc = syscalls("OFF")
+  Address ISPExec 'vget (zfsview)'
+  if zfsview = '' then zfsview = 'Browse'
+  if stdout.0 > 0 then
+  CALL stemview zfsview,'stdout.',,,"zfsadm" option
+  if stderr.0 > 0 then
+  CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option
+
+  return

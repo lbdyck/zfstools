@@ -1,6 +1,6 @@
 )Attr Default(%+_)
-   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
-   ` type(text) intens(high) color(red)
+   ! type( input) intens(high) caps(on ) just(left ) hilite(uscore)
+     color(green)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
 )Body  Expand(\\)
 %-\-\-~zFS Allocation%-\-\-
@@ -9,11 +9,12 @@
 + zFS Dataset:!zfsdsn                                        +
 +
 + Space Allocation:
-+   Primary:  !palc+    Primary Space in Cylinders
-+   Secondary:!salc+    Secondary Space in Cylinders
++   Primary:  !palc +   Primary Space in Cylinders
++   Secondary:!salc +   Secondary Space in Cylinders
 +   Dataclas: !dcls    +Dataclas
 +   Mgmtclas: !mcls    +Mgmtclas
 +   Storclas: !scls    +Storclas
++   Volser:   !zfsvol+  Volser
 +
 )Init
  .cursor = zfsdsn

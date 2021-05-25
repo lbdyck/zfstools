@@ -34,17 +34,19 @@
 
  if ispf = null then do
     x = test_from()
-    if x = 8 then
+    if x = 8 then do
        say 'Error:' ,
            'The From zFS is mounted and it must not be.' ,
                  'Unmount and try again.'
-    if sysdsn(tozfs) /= 'OK'
+       exit
+       end
+    if sysdsn(tozfs) = 'OK'
        then do
-          if x = 0 then leave
-          end
-       else say 'Error'
+       say 'Error' ,
                 'The To zFS must not exist and it does.' ,
                       'Either delete it or select a new name.'
+          exit
+          end
     end
 
 /* ---------------------------- *
