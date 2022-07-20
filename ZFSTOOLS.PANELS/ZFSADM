@@ -8,16 +8,16 @@
 %Option ===>_zcmd
 %
 %  1`aggrinfo       +Obtain information on an attached aggregate
-%  2`configquery    +query configuration settings for the zFS kernel
+%  2`configquery    +Query configuration settings for the zFS kernel
 %  3`fsinfo  !**    +Obtain file system information
 %  4`grow           +Grow a zFS (requires SuperUser)
-%  5`help           +get help on commands
-%  6`level          +display service level
-%  7`lsaggr         +list aggregates
-%  8`lsfs           +list filesystem information
-%  9`lssys          +list systems
-%  10`shrink  !***   +Shrink a zFS
-%  11`query          +query menu
+%  5`help           +Get help on commands
+%  6`level          +Display service level
+%  7`lsaggr         +List aggregates
+%  8`lsfs           +List filesystem information
+%  9`lssys          +List systems
+% 10`shrink  !***   +Shrink a zFS
+% 11`query          +Query menu
  +
   !**`z/OS 2.2 or newer, currently &zos390rl
  !***`z/OS 2.3 or newer, currently &zos390rl
