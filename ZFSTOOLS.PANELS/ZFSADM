@@ -1,5 +1,5 @@
 )Attr Default(%+_)
-   $ type( input) intens(high) caps(on ) just(left )
+   $ type(input) intens(high) caps(on) just(left)
    ` type(text) intens(high) color(red)
    ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
@@ -8,17 +8,19 @@
 %Option ===>_zcmd
 %
 %  1`aggrinfo       +Obtain information on an attached aggregate
-%  2`configquery    +query configuration settings for the zFS kernel
+%  2`configquery    +Query configuration settings for the zFS kernel
 %  3`fsinfo  !**    +Obtain file system information
 %  4`grow           +Grow a zFS (requires SuperUser)
-%  5`help           +get help on commands
-%  6`level          +display service level
-%  7`lsaggr         +list aggregates
-%  8`lsfs           +list filesystem information
-%  9`lssys          +list systems
-% 10`query          +query menu
+%  5`help           +Get help on commands
+%  6`level          +Display service level
+%  7`lsaggr         +List aggregates
+%  8`lsfs           +List filesystem information
+%  9`lssys          +List systems
+% 10`shrink  !***   +Shrink a zFS
+% 11`query          +Query menu
  +
- !**`z/OS 2.2 or newer, currently &zos390rl
+  !**`z/OS 2.2 or newer, currently &zos390rl
+ !***`z/OS 2.3 or newer, currently &zos390rl
  +
 %  Browse or View Results:$zfsview +Browse or View
  +
@@ -31,7 +33,7 @@
 &zfsview = trans(trunc(&zfsview,1) B,Browse V,View *,*)
 ver (&zfsview,nb,list,Browse,View)
 &ZSEL = TRANS (TRUNC (&ZCMD,'.')
-         1,'CMD(%zfsadm aggrinfo -long    )'
+         1,'CMD(%zfsadm aggrinfo -long   )'
          2,'CMD(%zfsadm configquery -all )'
          3,'CMD(%zfsadm fsinfo -all  )'
          4,'CMD(%zfsgrow)'
@@ -40,7 +42,8 @@ ver (&zfsview,nb,list,Browse,View)
          7,'CMD(%zfsadm lsaggr       )'
          8,'CMD(%zfsadm lsfs         )'
          9,'CMD(%zfsadm lssys        )'
-        10,'Panel(zfsquery)'
+        10,'CMD(%zfsshrk             )'
+        11,'Panel(zfsquery)'
          ' ',' '
          *,'?' )
 )End
