@@ -1,0 +1,21 @@
+)Attr Default(%+_)
+   ! type(input) intens(high) caps(on) just(left) Pad('_')
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+)Body  Expand(\\)
+%-\-\-~zFS Shrink%-\-\-
+%Command ===>_zcmd
+%
++ zFS Dataset:!zfsdsn                                        +
++
++ Size:!size    +in Kilobytes after the shrink operation
++
+% Notes:        +1. The zFS%must+be mounted for shrink to work
++                2. You%must+have UPDATE authority to the VSAM linear data set
++
+)Init
+ .cursor = zfsdsn
+)Proc
+  ver (&zfsdsn,nb,dsname)
+  ver (&size,nb,num)
+)End
