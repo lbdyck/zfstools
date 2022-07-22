@@ -5,14 +5,14 @@
  *                                                            *  
  * Syntax:    %zfsshrk                                        *  
  *                                                            *  
- * Author:    Lionel B. Dyck                                  *  
+ * Author:    Patrick Loftus                                  *  
  *                                                            *  
  * Notes:     This function requires the user have            *  
  *            UPDATE access to the zFS data set AND that the  *  
  *            zFS be mounted.                                 *  
  *                                                            *  
  * History:                                                   *  
- *            2022-07-20 - Creation                           *  
+ *            2022-07-20 - Creation via copy of ZFSGROW       *  
  *                                                            *  
  * ---------------------------------------------------------- */ 
                                                                  

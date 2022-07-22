@@ -66,3 +66,4 @@ Some of the REXX exec's included are:
 - Ed Jaffe for how to use bpxwunix
 - Paul from IBM z/OS USS Shell and Utilities for how to set SuperUser mode using syscall
 - Peter Giles for several usability updates
+- Patrick Loftus added zsfadm shrink option
