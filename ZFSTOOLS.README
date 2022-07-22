@@ -63,6 +63,7 @@ Some of the REXX exec's included are:
             - can delete a current zFS before allocating a new
               zFS and reloading
             - can restore from a gdg
+   ZFSSHRK  - Decreases the size of a mounted zFS
    ZFSSIZER - exec to prompt to size a zFS from a directory or MB's
    ZFSTOOLS - exec to altlib and libdef for this application if you
               don't install in ispf allocated libraries
@@ -77,3 +78,4 @@ Acknowledgements:
    - Paul from IBM z/OS USS Shell and Utilities for how to set
      SuperUser mode using syscall.
    - Peter Giles for several usability updates
+   - Patrick Loftus added zsfadm shrink option
