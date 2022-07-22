@@ -61,9 +61,9 @@ Some of the REXX exec's included are:
 * ZFSUMNT  - UnMount using the IBM Mount Table by File System
   * If z/OS 2.1 then use custom dialog
 * ZFSUSE   - Display information about zFS usage
-   
+
 ## Acknowledgements
 - Ed Jaffe for how to use bpxwunix
 - Paul from IBM z/OS USS Shell and Utilities for how to set SuperUser mode using syscall
 - Peter Giles for several usability updates
-- Patrick Loftus added zsfadm shrink option
+- Patrick Loftus added zfsadm shrink option
