@@ -42,6 +42,10 @@
  rc = syscalls("ON")
  rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
  rc = syscalls("OFF")
+
+/* ------------------------------- *
+ | View the results of the command |
+ * ------------------------------- */
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
  CALL stemview zfsview,'stdout.',,,"zfsadm" option
