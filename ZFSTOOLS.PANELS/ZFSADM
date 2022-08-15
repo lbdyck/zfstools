@@ -7,7 +7,7 @@
 %-\-\-~zfsadm Tools%-\-\-
 %Option ===>_zcmd
 %
-%  1`aggrinfo       +Obtain information on an attached aggregate
+%  1`aggrinfo       +Obtain information on attached aggregate
 %  2`configquery    +Query configuration settings for the zFS kernel
 %  3`fsinfo  !**    +Obtain file system information
 %  4`grow           +Grow a zFS (requires SuperUser)
