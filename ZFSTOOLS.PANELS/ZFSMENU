@@ -1,5 +1,6 @@
 )Attr Default(%+_)
    $ type( input) intens(high) caps(on ) just(left )
+   @ type(output) intens(high) caps(on ) just(left )
    ` type(text) intens(high) color(red)
    ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq  ) hilite(reverse)
@@ -26,8 +27,12 @@
  +
  ! *`Indicates SuperUser Authority may be required for some or all
     `part of the selection
- !**`z/OS 2.2 or newer, currently &zos390rl
+ !**`z/OS 2.2 or newer, currently@zosrl
 )Init
+ vget (zos390rl)
+*rexx(* zosrl zos390rl)
+ zosrl = space(zos390rl)
+*endrexx
 )Proc
 &ZSEL = TRANS (TRUNC (&ZCMD,'.')
          1,'CMD(%zfsback)'
