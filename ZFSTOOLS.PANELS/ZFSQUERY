@@ -1,5 +1,6 @@
 )Attr Default(%+_)
    $ type( input) intens(high) caps(on ) just(left )
+   @ type(output) intens(high) caps(on ) just(left )
    ` type(text) intens(high) color(red)
    ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
@@ -16,7 +17,7 @@
 %  7`locking                  % 15`vnodecache
 %  8`logcache                 %
  +
- !**`z/OS 2.2 or newer, currently &zos390rl
+ !**`z/OS 2.2 or newer, currently@zosrl
  +
 %  Browse or View Results:$zfsview +Browse or View
  +
@@ -25,6 +26,9 @@
  if (&zfsview = &z)
     &zfsview = 'Browse'
  VPUT (zfsview) Profile
+*rexx(* zosrl zos390rl)
+ zosrl = space(zos390rl)
+*endrexx
 )Proc
  &zfsview = trans(trunc(&zfsview,1) B,Browse V,View *,*)
  ver (&zfsview,nb,list,Browse,View)

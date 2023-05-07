@@ -1,5 +1,6 @@
 )Attr Default(%+_)
    $ type(input) intens(high) caps(on) just(left)
+   @ type(output) intens(high) caps(on ) just(left )
    ` type(text) intens(high) color(red)
    ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
@@ -7,7 +8,7 @@
 %-\-\-~zfsadm Tools%-\-\-
 %Option ===>_zcmd
 %
-%  1`aggrinfo       +Obtain information on attached aggregate
+%  1`aggrinfo       +Obtain information on an attached aggregate
 %  2`configquery    +Query configuration settings for the zFS kernel
 %  3`fsinfo  !**    +Obtain file system information
 %  4`grow           +Grow a zFS (requires SuperUser)
@@ -19,8 +20,9 @@
 % 10`shrink  !***   +Shrink a zFS
 % 11`query          +Query menu
  +
-  !**`z/OS 2.2 or newer, currently &zos390rl
- !***`z/OS 2.3 or newer, currently &zos390rl
+  !**`z/OS 2.2 or newer    !***`z/OS 2.3 or newer
+ +
+  %Current z/OS Level:@zosrl
  +
 %  Browse or View Results:$zfsview +Browse or View
  +
@@ -29,6 +31,9 @@
     &zfsview = 'Browse'
  VPUT (zfsview) Profile
  .cursor = zcmd
+*rexx(* zosrl zos390rl)
+ zosrl = space(zos390rl)
+*endrexx
 )Proc
 &zfsview = trans(trunc(&zfsview,1) B,Browse V,View *,*)
 ver (&zfsview,nb,list,Browse,View)

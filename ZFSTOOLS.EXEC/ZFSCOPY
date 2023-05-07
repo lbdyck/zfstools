@@ -141,5 +141,5 @@
  do i = 1 to trap.0
     if pos(fromzfsw,trap.i) > 0 then return 8
     end
- if sysdsn(fromzfs) /= 'OK' then return 4
+ if sysdsn(fromzfs) /= 'UNAVAILABLE DATASET' then return 4
  return 0

@@ -29,7 +29,6 @@
     `part of the selection
  !**`z/OS 2.2 or newer, currently@zosrl
 )Init
- vget (zos390rl)
 *rexx(* zosrl zos390rl)
  zosrl = space(zos390rl)
 *endrexx
@@ -45,7 +44,7 @@
          8,'cmd(%zfsibm fs1)'
          9,'cmd(%zfsibm fs2)'
         10,'panel(zfsuse)'
-        11,'cmd(%tsotrap %zlsof -su -v)'
+        11,'cmd(%zfszlsof)'
         12,'cmd(%zfscopy)'
         13,'cmd(%zfssizer)'
          ' ',' '

@@ -1,0 +1,17 @@
+/* --------------------  rexx procedure  -------------------- *
+ * Name:      ZFSZLSOF                                        *
+ *                                                            *
+ * Function:  Display results of the zlsof query              *
+ *                                                            *
+ * Syntax:    %zfszlsof                                       *
+ *                                                            *
+ * Author:    Lionel B. Dyck                                  *
+ *                                                            *
+ * History:                                                   *
+ *            05/07/23 - Creation                             *
+ *                                                            *
+ * ---------------------------------------------------------- */
+call outtrap 'zlsof.'
+'%zlsof -su -v'
+call outtrap 'off'
+call stemedit 'browse','zlsof.'
