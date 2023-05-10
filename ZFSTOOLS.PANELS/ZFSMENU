@@ -4,9 +4,6 @@
    ` type(text) intens(high) color(red)
    ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq  ) hilite(reverse)
-/* -------------------------- */
-/* zFSTools Menu for z/OS 2.2 */
-/* -------------------------- */
 )Body  Expand(\\)
 %-\-\-~zFS Tools%-\-\-
 %Option ===>_zcmd
@@ -18,16 +15,16 @@
  % 5`Mount    +Mount a zFS to a mount point!*
  % 6`UnMount  +UnMount a zFS from a mount point
  % 7`zfsadm   +zfsadm
- % 8`Mount FS +IBM's Mount by File System!**
- % 9`Mount MP +IBM's Mount by Mount Point!**
+ % 8`Mount FS +IBM's Mount by File System
+ % 9`Mount MP +IBM's Mount by Mount Point
  %10`zFSUse   +zFS Usage
- %11`zLSOF    +List users of File Systems !**
+ %11`zLSOF    +List users of File Systems
  %12`zFSCopy  +Generate ADRDSSU JCL to Copy a zFS
  %13`zFSSizer +Size a zFS dataset
+ %14`Remount  +Remount a mounted zFS changing from RO to RW or back!*
  +
  ! *`Indicates SuperUser Authority may be required for some or all
     `part of the selection
- !**`z/OS 2.2 or newer, currently@zosrl
 )Init
 *rexx(* zosrl zos390rl)
  zosrl = space(zos390rl)
@@ -47,6 +44,7 @@
         11,'cmd(%zfszlsof)'
         12,'cmd(%zfscopy)'
         13,'cmd(%zfssizer)'
+        14,'cmd(%zfsrmnt)'
          ' ',' '
          *,'?' )
 )End

@@ -1,0 +1,13 @@
+)Attr
+ _ type(input) hilite(uscore) caps(on) intens(low)
+ @ type(output) intens(low) caps(off)
+)Body Window(33,5)
++
++ Press%Enter+to confirm Remount.
++
++ Or%F3+to cancel.
++
+)Init
+ &zwinttl = 'zFS Remount Confirm'
+)Proc
+)End

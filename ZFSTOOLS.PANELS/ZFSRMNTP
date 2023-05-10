@@ -1,0 +1,24 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) hilite(uscore)
+   $ type(output) intens(low ) caps(off) just(left ) color(green)
+   # type(output) intens(low ) caps(off) just(left )
+   ` type(output) intens(low ) caps(off) just(left ) color(green )
+   @ type(output) intens(high) caps(off) just(left ) color(yellow)
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   | type(text) intens(low ) color(green)
+)Body  Expand(\\)
+%-\-\-~zFS Remount%-\-\-
+%Command ===>_zcmd
++                                                     (See Tutorial for Options)
++S  Attr |zFS Dataset
++           Mount point
++-------------------------------------------------------------------------------
+)Model
+!z+$z @z+`zfsfile
+           #path
+)Init
+ .zvars = '(zfssel mnt flg)'
+ .help  = zfsrmnth
+)Proc
+ ver (&zfssel,list,S)
+)End

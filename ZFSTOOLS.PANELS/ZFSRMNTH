@@ -1,0 +1,35 @@
+)Attr Default(%+_)
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` area(SCRL) Extend(ON)
+)Body  Expand(\\)
+%Tutorial\-\-~zFS Remount%-\-\%Tutorial
+%Command ===>_zcmd
+                                                                  %Up F10 Dn F11
+`sam --------------------------------------------------------------------------`
+)Area Sam
++ Remount a mounted ZFS filesystem - this is a toggle:
++
++    From Read Write%RW+to Read Only%RO+
++ or
++    From Read Only%RO+to Read Write%RW+
++
++  Available Primary Commands:
++ %Find+string             string within ZFS dataset name or mount point
++ %Refresh+                refresh the list of mounted ZFS filesystems
++ %SORT+option             %M+mount point
++                          %F+by filesystem
++                          %R+by mount type
++
++  Abbreviations:%F+ind and%REF+resh
++
++  Selection:
++ %S+                       Select to toggle the mount attributes
++
++Notes:+ 1. Uses the TSO UNMOUNT command with the REMOUNT option
++        2. Requires access to Facility class BPX.SUPERUSER
++        3. No need to enter%su+as with the 3.17 dialog
+)Init
+ .help  = zfsrmnth
+ &zcont = zfsrmnth
+)Proc
+)End

@@ -1,0 +1,246 @@
+  /* --------------------  rexx procedure  -------------------- *
+  | Name:      zfsrmnt                                         |
+  |                                                            |
+  | Function:  Remount a ZFS using the UNMOUNT ... REMOUNT     |
+  |            command. This is a 'toggle' that will change    |
+  |            mount status of RW to RO and vice versa.        |
+  |                                                            |
+  | Syntax:    %zfsmnt                                         |
+  |                                                            |
+  | Dependencies:  1. User must be able to get SuperUser uid:0 |
+  |                   to use the UNMOUNT command               |
+  |                   - See Facility Class BPX.SUPERUSER       |
+  |                2. Repeat Find (RFIND) requires that a      |
+  |                   Command table entry be defined in the    |
+  |                   site/user/ISPCMDS table thus:            |
+  |                   Command: RFIND                           |
+  |                   Trunc:   0                               |
+  |                   Desc:    user repeat find                |
+  |                   Action:  &USRRFIND                       |
+  |                                                            |
+  | Author:    Lionel B. Dyck                                  |
+  |                                                            |
+  | History:  (most recent on top)                             |
+  |            2023/05/10 LBD - Add sort by mount type         |
+  |                           - correct find bug               |
+  |                           - Support RFIND                  |
+  |                           - Check for superuser access     |
+  |            2023/05/09 LBD - Refine                         |
+  |                           - Add Sort option                |
+  |            2023/05/08 LBD - Creation                       |
+  |                                                            |
+  * ---------------------------------------------------------- */
+  parse value '' with null flg rfind gooduid0
+
+  /* ----------------------------------- *
+  | Get list of all mounted filesystems |
+  | and Create the ISPF Table           |
+  * ----------------------------------- */
+Restart:
+  x = syscalls('ON')
+  address syscall
+  numeric digits 12
+  'getmntent m.'
+  tab = 'ZFS'time('s')
+
+  /* -------------------------------------- *
+   | Call to check if user can get uid of 0 |
+   * -------------------------------------- */
+  call check_uid0
+
+  /* ---------------------------------------- *
+  | Create ISPF Table of Mounted Filesystems |
+  * ---------------------------------------- */
+  Address ISPExec 'tbcreate' tab  'names(mnt flg zfsfile path) nowrite'
+  do i=1 to m.0
+    'statfs' m.mnte_fsname.i 's.'
+    if left(m.mnte_fsname.i,1) = '/' then iterate
+    if left(m.mnte_fsname.i,1) = '*' then iterate
+    if s.stfs_rdonly = 0
+    then mnt = 'RW'
+    else mnt = 'RO'
+    path    = m.mnte_path.i
+    zfsfile = strip(m.mnte_fsname.i)
+    Address ISPExec'tbadd' tab
+  end
+
+  /* -------------- *
+  | Define ISPExec |
+  * -------------- */
+  Address ISPExec
+
+  /* ---------------------- *
+  | Display the ISPF Table |
+  * ---------------------- */
+  'tbsort' tab 'fields(zfsfile,c,a)'
+  'tbtop' tab
+  skip = 0
+  do forever
+    parse value '' with zfssel zedsmsg
+    if skip > 0 then do
+      'tbtop' tab
+      'tbskip' tab 'number('skip')'
+    end
+    'tbdispl' tab 'panel(zfsrmntp)'
+    if rc > 4 then leave     /* F3 entered so exit */
+    skip = ztdtop
+
+    if zcmd = 'RFIND' then do
+      zcmd = 'FIND' rfind
+    end
+    else do
+      last_find = 0
+      rfind = null
+    end
+
+    Select
+      /* ------------------------------------- *
+      | Process the SORT command              |
+      |    M - sort by mount point (path)     |
+      |    anything else sort by dataset name |
+      * ------------------------------------- */
+      When word(zcmd,1) = 'SORT' then do
+        sortopt = null
+        if left(word(zcmd,2),1) = 'R'
+        then sortopt = 'mnt'
+        if left(word(zcmd,2),1) = 'M'
+        then sortopt = 'path'
+        if sortopt = null
+        then sortopt = 'zfsfile'
+        'tbsort' tab 'fields('sortopt',c,a)'
+        zedsmsg = 'Sorted.'
+        zedlmsg = 'Sorted by' sortopt
+        'Setmsg msg(isrz001)'
+        skip = 0
+      end
+      /* ---------------------------------------------------------- *
+      | Process Find - look for value in both the file system name |
+      | and in the mount point.                                    |
+      * ---------------------------------------------------------- */
+      When abbrev('FIND',word(zcmd,1),1) = 1 then do
+        find_word = word(zcmd,2)
+        rfind = find_word
+        usrrfind = "PASSTHRU"
+        if last_find > 0 then do
+          'tbtop' tab
+          'tbskip' tab 'number('last_find')'
+          row = last_find
+        end
+        else do
+          'tbtop' tab
+          row = 0
+        end
+        do forever
+          'tbskip' tab
+          if rc > 0 then do
+            zedsmsg = 'Not Found.'
+            zedlmsg = find_word 'not found.'
+            'setmsg msg(isrz001)'
+            'tbtop' tab
+            leave
+          end
+          row = row + 1
+          if zedsmsg = null then
+          if pos(find_word,zfsfile) > 0 then do
+            zedsmsg = 'Found.'
+            zedlmsg = find_word 'found in row' row
+            'setmsg msg(isrz001)'
+            skip = row
+            last_find = row
+            leave
+          end
+          if zedsmsg = null then
+          if pos(find_word,translate(path)) > 0 then do
+            zedsmsg = 'Found.'
+            zedlmsg = find_word 'found in row' row
+            'setmsg msg(isrz001)'
+            skip = row
+            last_find = row
+            leave
+          end
+        end
+      end
+      /* ------------------------------------ *
+      | Refresh command to rebuild the table |
+      * ------------------------------------ */
+      When abbrev('REFRESH',zcmd,3) = 1 then do
+        'tbend' tab
+        signal restart
+      end
+      /* ---------------- *
+      | Check for select |
+      * ---------------- */
+      Otherwise if zfssel = 'S' then
+        if gooduid0 /= null then do
+           zedsmsg = 'Error.'
+           zedlmsg = 'You do not have access to BPX.SUPERUSER Facility' ,
+                     'class and thus are not allowed to use Remount.'
+           'setmsg msg(isrz001)'
+           end
+        else do
+        zfscnf = null
+        'AddPop Row(8) Column(22)'
+        'display panel(zfsrmntq)'
+        zfscnf = rc
+        'rempop'
+        if zfscnf = 0 then do
+           call do_it
+           'tbput' tab
+           end
+        else do
+             zedsmsg = 'Cancelled.'
+             zedlmsg = 'Remount change cancelled per user request.'
+             'setmsg msg(isrz001)'
+             end
+      end
+    end
+  end
+  /* ------------------ *
+  | Close out and exit |
+  * ------------------ */
+  'tbend' tab
+  rc = syscalls("OFF")
+  Exit
+
+  /* -------------------------- *
+   | Check for SuperUser access |
+   * -------------------------- */
+Check_UID0:
+  address syscall 'geteuid'   /* get current euid */
+  euid = retval
+  address syscall 'seteuid 0' /* try to set uid 0 */
+  if retval /= 0 then do
+     gooduid0 = 1
+     zedsmsg = 'Error.'
+     zedlmsg = 'Unable to get UID of 0, meaning you do not have' ,
+               'access to BPX.SUPERUSER Facility class and will' ,
+               'not be able to issue the Remount command.'
+     address ispexec 'setmsg msg(isrz001)'
+     return
+     end
+  address syscall 'seteuid' euid  /* reset back */
+  return
+
+  /* -------------------------------------------------- *
+  | Issue the Unmount command with the Remount keyword |
+  * -------------------------------------------------- */
+Do_It:
+  /* issue the unmount remount command */
+  Address TSO ,
+    'Unmount Filesystem('zfsfile') Remount'
+  mrc = rc
+  flg = '*'
+  omnt = mnt
+  if mnt = 'RW'
+  then mnt = 'RO'
+  else mnt = 'RW'
+  if mrc > 0 then do
+    zedsmsg = 'Failed.'
+    zedlmsg = zfsfile 'mount change failed. Are you sure you have SuperUser?'
+    'Setmsg msg(isrz001)'
+  end
+  zedsmsg = 'Remounted.'
+  zedlmsg = left(zfsfile 'mount changed from' omnt 'to' mnt,74) ,
+    'at' path
+  'Setmsg msg(isrz001)'
+  return
