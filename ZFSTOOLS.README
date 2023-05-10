@@ -1,9 +1,10 @@
-Installation:  Copy the EXEC members into a library in your SYSPROC
+## Installation:
+               Copy the EXEC members into a library in your SYSPROC
                or SYSEXEC allocation.
                Copy the PANELS members into a library in your ISPPLIB
                allocation.
 
-Dependencies:
+## Dependencies:
   - This ISPF dialog utilizes the STEMEDIT utility which can be found
     on the CBTTape FILE 183.
   - Some elements of the dialog require the user to have SuperUser
@@ -11,7 +12,7 @@ Dependencies:
   - the zLSOF option on the menu requires access to SYS1.SBPXEXEC where
     IBM ships this exec
 
-Overview:
+## Overview:
 
 zFSTools is an ISPF dialog that combines home grown and IBM dialogs to
 assist and simplify the management of zFS datasets. With this dialog you
@@ -24,7 +25,7 @@ to the ISPF menus and panels.
 Some of the functions require that the user have the ability to become
 a SuperUser and if you have that ability then those functions (e.g. mount,
 unmount, grow) will work very well. If not, then find someone who can do
-it for you.
+it for you. See member $REMNT for more information on the remount function.
 
 The backup and restore functions work with any unmounted zFS dataset and
 support using a GDG for the backup dataset if desired using relative GDG
@@ -63,7 +64,8 @@ Some of the REXX exec's included are:
             - can delete a current zFS before allocating a new
               zFS and reloading
             - can restore from a gdg
-   ZFSSHRK  - Decreases the size of a mounted zFS
+ * ZFSRMNT  - Remount a zFS to change from ReadOnly to ReadWrite and
+              back (toggle)
    ZFSSIZER - exec to prompt to size a zFS from a directory or MB's
    ZFSTOOLS - exec to altlib and libdef for this application if you
               don't install in ispf allocated libraries
@@ -73,9 +75,42 @@ Some of the REXX exec's included are:
 
    * - these functions require SU authority
 
-Acknowledgements:
+## Acknowledgements:
    - Ed Jaffe for how to use bpxwunix
    - Paul from IBM z/OS USS Shell and Utilities for how to set
      SuperUser mode using syscall.
    - Peter Giles for several usability updates
-   - Patrick Loftus added zfsadm shrink option
+
+## Remount Info
+
+ZFSRMNT is an ISPF dialog to simplify changing the mount attributes of a
+mounted zFS from RO to RW and vice versa using the UNMOUNT command with
+the REMOUNT option - it's a toggle.
+
+This is an alternative to ISPF 3.17 with no need to enter the su command
+to gain authorization.
+
+Dependencies:  1. User must be able to get SuperUser uid:0
+                  to use the UNMOUNT command
+                  - See Facility Class BPX.SUPERUSER
+               2. Repeat Find (RFIND) requires that a
+                  Command table entry be defined in the
+                  site/user/ISPCMDS table thus:
+                  Command: RFIND
+                  Trunc:   0
+                  Desc:    user repeat find
+                  Action:  &USRRFIND
+
+Available Commands:
+
+Available Primary Commands:
+Find string             string within ZFS dataset name or mount point
+Refresh                 refresh the list of mounted ZFS filesystems
+SORT option             M mount point
+                        F by filesystem
+                        R by mount type
+
+Abbreviations: Find and REFresh
+
+Selection:
+S                        Select to toggle the mount attributes
