@@ -1,5 +1,5 @@
 )Attr Default(%+_)
-   ! type( input) intens(high) caps(on ) just(left ) Pad('_')
+   ! type( input) intens(high) caps(on ) just(left ) hilite(uscore)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
    ` type(text) intens(high) color(red)
 )Body  Expand(\\)
