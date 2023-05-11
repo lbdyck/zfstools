@@ -26,9 +26,24 @@
  ! *`Indicates SuperUser Authority may be required for some or all
     `part of the selection
 )Init
-*rexx(* zosrl zos390rl)
+*rexx(* zosrl zos390rl zedsmsg zedlmsg)
  zosrl = space(zos390rl)
+  address syscall 'geteuid'   /* get current euid */
+  euid = retval
+  address syscall 'seteuid 0' /* try to set uid 0 */
+  zedsmsg = ''
+  if retval /= 0 then do
+     zedsmsg = 'Warning.'
+     zedlmsg = 'Unable to get UID of 0, meaning you do not have' ,
+         'access to BPX.SUPERUSER Facility class and will' ,
+         'not be able to issue the Remount command.'
+     end
+  else do
+       address syscall 'seteuid' euid  /* reset back */
+       end
 *endrexx
+ if (&ZEDSMSG NE &Z)
+    .msg = isrz001
 )Proc
 &ZSEL = TRANS (TRUNC (&ZCMD,'.')
          1,'CMD(%zfsback)'
