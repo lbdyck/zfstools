@@ -16,7 +16,7 @@ many of the zfsadm functions (grow is one of them), mount and unmount
 filesystems, and even rename a zFS dataset. All with comparitive ease thanks
 to the ISPF menus and panels.
 
-![image](https://user-images.githubusercontent.com/24498661/180071582-f2e127da-629c-4048-b693-e604a5d01a7f.png)
+![image](https://github.com/lbdyck/zfstools/assets/42328411/cd62fe87-901b-4e35-a193-5a95f30bfda0)
 
 Some of the functions require that the user have the ability to become
 a SuperUser and if you have that ability then those functions (e.g. mount,
