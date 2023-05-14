@@ -55,6 +55,7 @@ Some of the REXX exec's included are:
   * can create a new zFS
   * can delete a current zFS before allocating a new zFS and reloading
   * can restore from a gdg
+* ZFSRMNT  - Remount a zFS changing from RO to RW and vice versa
 * ZFSSHRK  - Decreases the size of a mounted zFS
 * ZFSSIZER - Exec to prompt to size a zFS from a directory or by MB's
 * ZFSTOOLS - Exec to altlib and libdef for this application if you don't install in ISPF allocated libraries
