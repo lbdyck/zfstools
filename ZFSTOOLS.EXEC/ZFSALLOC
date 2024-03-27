@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            03/27/24 - Support Cyl and Megabyte allocations *
   *            05/17/21 - Add volser option                    *
   *            08/06/18 - Bug fix for dataclass                *
   *            05/17/16 - Add Mgmt                             *
@@ -44,7 +45,11 @@ Do_It:
   /* -------------- *
   * Define the zFS *
   * -------------- */
-  stype = "CYLINDERS"
+  Select
+    When atype = 'C' then stype = "CYLINDERS"
+    When atype = 'M' then stype = "MEGABYTES"
+    otherwise stype = 'CYLINDERS'
+    end
   parse value '' with dopt sopt mopt
   if dcls /= null then dopt = "Dataclas("dcls")"
   if mcls /= null then mopt = "Mgmtclas("mcls")"

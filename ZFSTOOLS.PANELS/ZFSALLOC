@@ -9,8 +9,9 @@
 + zFS Dataset:!zfsdsn                                        +
 +
 + Space Allocation:
-+   Primary:  !palc +   Primary Space in Cylinders
-+   Secondary:!salc +   Secondary Space in Cylinders
++   Unit:     !z+       Cyl or MB
++   Primary:  !palc +   Primary Space
++   Secondary:!salc +   Secondary Space
 +   Dataclas: !dcls    +Dataclas
 +   Mgmtclas: !mcls    +Mgmtclas
 +   Storclas: !scls    +Storclas
@@ -18,8 +19,10 @@
 +
 )Init
  .cursor = zfsdsn
+ .zvars = '(atype)'
 )Proc
-  ver (&zfsdsn,nb,dsname)
+  ver (&zfsdsn,nb,dsnameq)
+  ver (&atype,nb,list,C,M)
   ver (&palc,nb,num)
   ver (&salc,nb,num)
   ver (&dcls,dsname)
