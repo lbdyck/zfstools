@@ -11,7 +11,7 @@
 %-\-\-~zFS Usage%-\-\-
 %Command ===>#zcmd    \ \%Scroll ===>#zcsr+
 %
-%Commands: Sort column order
+%Commands:+Sort column order   %Sel:+F to Free (shrink) or anything to View
 %
 %S@Use        Owner    Attributes                       Parm
   !File_System

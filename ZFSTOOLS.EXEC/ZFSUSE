@@ -145,7 +145,11 @@
     zsel = null
     'tbdispl zfsuse panel(zfsusetb)'
     if rc > 0 then leave
-    if zsel /= null then do
+    if translate(zsel) = 'F' then
+       if left(zfs,1) /= '*' then do
+       "select cmd(%zfsshrk '"strip(zfs)"')"
+       end
+    else if zsel /= null then do
        'SELECT PGM(ISRDSLST) PARM(UDL' zmnt')'
        end
     if zcmd /= '' then do
