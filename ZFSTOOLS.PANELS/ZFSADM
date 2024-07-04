@@ -2,7 +2,6 @@
    $ type(input) intens(high) caps(on) just(left)
    @ type(output) intens(high) caps(on ) just(left )
    ` type(text) intens(high) color(red)
-   ! type(text) intens(high) color(yellow)
    ~ type(text) intens(high) color(turq)  hilite(reverse)
 )Body  Expand(\\)
 %-\-\-~zfsadm Tools%-\-\-
@@ -10,17 +9,17 @@
 %
 %  1`aggrinfo       +Obtain information on an attached aggregate
 %  2`configquery    +Query configuration settings for the zFS kernel
-%  3`fsinfo  !**    +Obtain file system information
+%  3`fsinfo         +Obtain file system information
 %  4`grow           +Grow a zFS (requires SuperUser)
 %  5`help           +Get help on commands
 %  6`level          +Display service level
 %  7`lsaggr         +List aggregates
 %  8`lsfs           +List filesystem information
 %  9`lssys          +List systems
-% 10`shrink  !***   +Shrink a zFS
+% 10`shrink         +Shrink a zFS
 % 11`query          +Query menu
  +
-  !**`z/OS 2.2 or newer    !***`z/OS 2.3 or newer
+ +
  +
   %Current z/OS Level:@zosrl
  +
