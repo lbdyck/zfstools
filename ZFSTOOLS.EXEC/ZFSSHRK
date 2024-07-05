@@ -1,126 +1,28 @@
-  /* --------------------  rexx procedure  -------------------- *
-  * Name:      zfsshrk                                         *
-  *                                                            *
-  * Function:  Shrink an existing zFS dataset                  *
-  *                                                            *
-  * Syntax:    %zfsshrk zfs-dsname                             *
-  *                                                            *
-  * Author:    Patrick                                         *
-  *            Lionel B. Dyck                                  *
-  *                                                            *
-  * Notes:     This function requires the user have            *
-  *            UPDATE access to the zFS data set AND that the  *
-  *            zFS be mounted.                                 *
-  *                                                            *
-  * History:                                                   *
-  *            2024-07-04 - Allow zfs dsname to be passed      *
-  *                       - some restructure                   *
-  *            2024-06-11 - Enhancement for current size       *
-  *            2022-07-20 - Creation                           *
-  *                                                            *
-  * ---------------------------------------------------------- */
-
-  arg zfsdsn
-
-  parse value '' with null size csize
-
-  if zfsdsn /= null then do
-    call get_size
-  end
-
-  Address ISPExec
-  do forever
-    "Display Panel(zfsshrk)"
-    if rc > 4 then exit 0
-    if sysdsn(zfsdsn) = 'DATASET NOT FOUND' then do
-      zedsmsg = null
-      zedlmsg = 'The specified dataset does not exist.'
-      'setmsg msg(isrz001)'
-      iterate
-    end
-    call get_size
-    Address ISPExec
-    if hit = 1 then iterate
-    if size = null then iterate
-    call do_it
-  end
-
-Do_It:
-  /* ------------------------------------ *
-  * Verify that the requested zFS exists *
-  * ------------------------------------ */
-  checkdsn = sysdsn(zfsdsn)
-  if checkdsn \= "OK" & checkdsn \= "UNAVAILABLE DATASET" then do
-    zedsmsg = null
-    zedlmsg = 'Error:' zfsdsn "does not exist."
-    "Setmsg msg(isrz001)"
-    return
-  end
-
-  Address TSO
-  option = "shrink -aggregate" zfsdsn "-size" size
-  address syscall 'geteuid'
-  myeuid=retval
-  Address syscall "seteuid 0"
-  rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
-  rc = syscalls("OFF")
-  Address syscall "seteuid" myeuid
-  Address ISPExec 'vget (zfsview)'
-  if zfsview = null then zfsview = 'Browse'
-  call stemedit zfsview,'stdout.',,,"zfsadm" option
-  reason = null
-  if stderr.0 > 0 then do
-    do i = 1 to stderr.0
-      stem.i = stderr.i
-      if pos('reason code=',stderr.i) > 0 then
-      parse value stderr.i with . 'reason code='reason'.' .
-    end
-    if reason /= null then do
-      call outtrap 'e.'
-      'bpxmtext' reason
-      call outtrap 'off'
-      i = stderr.0
-      i = i + 1
-      stderr.i = copies('-',60)
-      stderr.0 = i
-      do ie = 1 to e.0
-        i = i + 1
-        stderr.i = e.ie ' '
-        stderr.0 = i
-      end
-    end
-    CALL stemedit zfsview,'stderr.',,,"zfsadm error" option
-  end
-  if stdout.0 > 0 then do
-     save_csize = csize
-     save_size = size
-     size = null
-     call get_size
-     zedsmsg = null
-     zedlmsg = 'ZFS' zfsdsn 'resized from' save_csize 'to' size ,
-       'reclaiming' save_csize - size 'kilobytes.'
-     address ispexec 'setmsg msg(isrz001)'
-  Return
-
-FixUp_DSN:
-  if left(zfsdsn,1) = "'" then return
-  x = listdsi(zfsdsn)
-  zfsdsn = "'"sysdsname"'"
-  Return
-
-Get_Size:
-  call fixup_dsn
-  hit = 0
-  if size = null then do
-    option = 'fsinfo -aggregate' zfsdsn '-full'
-    rc = bpxwunix("zfsadm" option,,s.,e.)
-    do i = 1 to s.0
-      if pos('   Size: ',s.i) = 0 then iterate
-      parse value s.i with . 'Size:'csize .
-      csize = left(csize,length(csize)-1)
-      leave
-    end
-    hit = 1
-    size = csize
-  end
-  Return
+)Attr Default(%+_)
+   ! type(input) intens(high) caps(on) just(left) hilite(uscore)
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   ` type(text) intens(high) color(red)
+   @ type(output) intens(high)
+)Body  Expand(\\)
+%-\-\-~zFS Shrink%-\-\-
+%Command ===>_zcmd
++
++ zFS Dataset:!zfsdsn                                        +
++
++ Current Size:@csize          +in Kilobytes - press enter with size
++
++ Target Size:!size          +in Kilobytes after the shrink operation
++                             blank to update current size
++
++ Current Used Percentage:@p    +
++
+% Notes:          +1. The zFS%must+be mounted for shrink to work
++                  2. You%must+have UPDATE authority to the VSAM linear data set
++
+)Init
+ .cursor = zfsdsn
+)Proc
+  ver (&zfsdsn,nb,dsname)
+  if (&size NE &Z)
+      ver (&size,nb,num)
+)End
