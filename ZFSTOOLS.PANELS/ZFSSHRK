@@ -11,8 +11,10 @@
 +
 + Current Size:@csize          +in Kilobytes - press enter with size
 +
-+ Size:!size          +in Kilobytes after the shrink operation
-+                      blank to update current size
++ Target Size:!size          +in Kilobytes after the shrink operation
++                             blank to update current size
++
++ Current Used Percentage:@p    +
 +
 % Notes:          +1. The zFS%must+be mounted for shrink to work
 +                  2. You%must+have UPDATE authority to the VSAM linear data set
