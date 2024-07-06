@@ -66,6 +66,7 @@ Some of the REXX exec's included are:
             - can restore from a gdg
  * ZFSRMNT  - Remount a zFS to change from ReadOnly to ReadWrite and
               back (toggle)
+   ZFSSHRK  - exec to shrink an existing ZFS
    ZFSSIZER - exec to prompt to size a zFS from a directory or MB's
    ZFSTOOLS - exec to altlib and libdef for this application if you
               don't install in ispf allocated libraries
