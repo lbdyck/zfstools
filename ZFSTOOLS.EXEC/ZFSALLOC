@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            07/07/24 - Correct stemedit title               *
   *            03/27/24 - Support Cyl and Megabyte allocations *
   *            05/17/21 - Add volser option                    *
   *            08/06/18 - Bug fix for dataclass                *
@@ -83,9 +84,6 @@ Do_It:
   rc = syscalls("OFF")
   Address ISPExec 'vget (zfsview)'
   if zfsview = '' then zfsview = 'Browse'
-  if stdout.0 > 0 then
-  CALL stemview zfsview,'stdout.',,,"zfsadm" option
-  if stderr.0 > 0 then
-  CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option
+  CALL stemview zfsview,'stdout.',,,"zfs allocation"
 
   return
