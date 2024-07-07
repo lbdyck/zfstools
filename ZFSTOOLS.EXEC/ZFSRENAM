@@ -8,6 +8,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/21/16 - Correction for fully qualified dsns  *
  *            05/18/16 - Creation                             *
  *                                                            *
@@ -78,6 +79,6 @@ Do_It:
 
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'view'
- CALL stemview zfsview,'c.',,,"zFS Rename"
+ CALL stemedit zfsview,'c.',,,"zFS Rename"
 
  return

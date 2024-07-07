@@ -3,6 +3,7 @@
 /*--------------------------------------------------------------------*/
 /* FLG  YYMMDD  USERID   DESCRIPTION                                  */
 /* ---  ------  -------  -------------------------------------------- */
+/* @LB  240707  LBD      Change stemview to stemedit                  */
 /* @LX  210513  LBD      Remove special chars from zedlmsg            */
 /* @PG  160615  LBD      updates from Peter Giles                     */
 /* @LD  160520  LBD      syntax is fixed perc then string             */
@@ -146,7 +147,7 @@ t.row = 'Total Filesystems Listed  =' l                         /* @LD */
 t.0 = row                                                       /* @LD */
 Address ISPExec 'vget (zfsview)'                                /* @PG */
 if zfsview = '' then zfsview = 'Browse'                         /* @PG */
-CALL stemview zfsview,'t.',,,"zFS Usage Report"                 /* @PG */
+CALL stemedit zfsview,'t.',,,"zFS Usage Report"                 /* @PG */
 
 exit(0)
 

@@ -8,6 +8,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/19/16 - Check fsinfo for z/OS 2.2 or newer   *
  *            05/16/16 - Add view option                      *
  *            05/13/16 - Creation                             *
@@ -48,6 +49,6 @@
  * ------------------------------- */
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
- CALL stemview zfsview,'stdout.',,,"zfsadm" option
+ CALL stemedit zfsview,'stdout.',,,"zfsadm" option
  if stderr.0 > 0 then
-    CALL stemview zfsview,'stderr.',,,"zfsadm stderr" option
+    CALL stemedit zfsview,'stderr.',,,"zfsadm stderr" option

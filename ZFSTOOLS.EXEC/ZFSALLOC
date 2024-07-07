@@ -9,6 +9,7 @@
   *                                                            *
   * History:                                                   *
   *            07/07/24 - Correct stemedit title               *
+  *                     - Replace STEMView with STEMEdit       *
   *            03/27/24 - Support Cyl and Megabyte allocations *
   *            05/17/21 - Add volser option                    *
   *            08/06/18 - Bug fix for dataclass                *
@@ -84,6 +85,6 @@ Do_It:
   rc = syscalls("OFF")
   Address ISPExec 'vget (zfsview)'
   if zfsview = '' then zfsview = 'Browse'
-  CALL stemview zfsview,'stdout.',,,"zfs allocation"
+  CALL stemedit zfsview,'stdout.',,,"zfs allocation"
 
   return

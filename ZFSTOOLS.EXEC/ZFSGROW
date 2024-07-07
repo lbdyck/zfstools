@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/16/16 - Creation                             *
  *                                                            *
  * ---------------------------------------------------------- */
@@ -45,7 +46,7 @@ Do_It:
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
-    CALL stemview zfsview,'stdout.',,,"zfsadm" option
+    CALL stemedit zfsview,'stdout.',,,"zfsadm" option
  if stderr.0 > 0 then do
     do i = 1 to stderr.0
        stem.i = stderr.i
@@ -57,6 +58,6 @@ Do_It:
     i = i + 1
     stem.i = 'look up the error code and correct.'
     stem.0 = i
-    CALL stemview zfsview,'stem.',,,"zfsadm error" option
+    CALL stemedit zfsview,'stem.',,,"zfsadm error" option
     end
  Return

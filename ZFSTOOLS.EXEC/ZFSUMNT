@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/19/16 - Support z/OS 2.1 and 2.2+            *
  *            05/18/16 - Call the IBM Mount Table by          *
  *                       File System dialog                   *
@@ -59,9 +60,9 @@ Do_It:
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
  if stdout.0 > 0 then
-    CALL stemview zfsview,'stdout.',,,"zfsadm" option
+    CALL stemedit zfsview,'stdout.',,,"zfs Unmount" option
  if stderr.0 > 0 then
-    CALL stemview zfsview,'stderr.',,,"zfsadm error" option
+    CALL stemedit zfsview,'stderr.',,,"zfs Unmount error" option
  if stdout.0 + stderr.0 = 0 then do
     zedsmsg = ""
     zedlmsg = zfspath "was successfully unmounted."

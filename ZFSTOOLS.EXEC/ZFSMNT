@@ -11,6 +11,7 @@
  *            SuperUser authority                             *
  *                                                            *
  * History:                                                   *
+ *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/19/16 - Enable support for z/OS 2.1 and 2.2+ *
  *            05/18/16 - Changed to use IBM's Mount dialog    *
  *            05/17/16 - Add Read Only/Read Write flag        *
@@ -79,9 +80,9 @@ Do_It:
  Address ISPExec 'vget (zfsview)'
  if zfsview = null then zfsview = 'Browse'
  if stdout.0 > 0 then
-    CALL stemview zfsview,'stdout.',,,"zfsadm" option
+    CALL stemedit zfsview,'stdout.',,,"zfs mount" option
  if stderr.0 > 0 then
-    CALL stemview zfsview,'stderr.',,,"zfsadm error" option
+    CALL stemedit zfsview,'stderr.',,,"zfs mount error" option
  if stdout.0 + stderr.0 = 0 then do
     zedsmsg = ''
     zedlmsg = zfsdsn "was successfully mounted on:" zfspath
