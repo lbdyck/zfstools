@@ -118,10 +118,15 @@ Do_It:
       option = 'fsinfo -aggregate' zfsdsn '-full'
       rc = bpxwunix("zfsadm" option,,s.,e.)
       do i = 1 to s.0
-        if pos('   Size: ',s.i) = 0 then iterate
-        parse value s.i with . 'Size:'csize .
-        csize = left(csize,length(csize)-1)
-        leave
+        if pos('  Size:',s.i) > 0 then do
+           parse value s.i with . 'Size:'csize .
+           csize = left(csize,length(csize)-1)
+           end
+        if pos('  Status:',s.i) > 0 then
+           if pos('NM',s.i) > 0 then do
+              csize = 'Not Mounted'
+              return
+              end
       end
       hit = 1
       size = csize
