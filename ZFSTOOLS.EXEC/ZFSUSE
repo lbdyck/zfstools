@@ -3,6 +3,7 @@
 /*--------------------------------------------------------------------*/
 /* FLG  YYMMDD  USERID   DESCRIPTION                                  */
 /* ---  ------  -------  -------------------------------------------- */
+/* @LB  240708  LBD      Improve for shrink                           */
 /* @LX  210513  LBD      Remove special chars in zedlmsg              */
 /* @LT  180530  LBD      create a table view of the results           */
 /*                       add sort and find commands                   */
@@ -145,9 +146,10 @@
     zsel = null
     'tbdispl zfsuse panel(zfsusetb)'
     if rc > 0 then leave
-    if translate(zsel) = 'F' then
+    if translate(zsel) = 'F' then do
        if left(zfs,1) /= '*' then do
        "select cmd(%zfsshrk '"strip(zfs)"')"
+       end
        end
     else if zsel /= null then do
        'SELECT PGM(ISRDSLST) PARM(UDL' zmnt')'
