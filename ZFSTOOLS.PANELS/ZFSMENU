@@ -22,6 +22,7 @@
  %12`zFSCopy  +Generate ADRDSSU JCL to Copy a zFS
  %13`zFSSizer +Size a zFS dataset
  %14`Remount  +Remount a mounted zFS changing from RO to RW or back!*
+ %15`AutoMount+Report/View all AutoMounted Filesystems
  +
  ! *`Indicates SuperUser Authority may be required for some or all
     `part of the selection
@@ -60,6 +61,7 @@
         12,'cmd(%zfscopy)'
         13,'cmd(%zfssizer)'
         14,'cmd(%zfsrmnt)'
+        15,'cmd(%zfsamnt)'
          ' ',' '
          *,'?' )
 )End

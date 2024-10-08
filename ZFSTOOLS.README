@@ -41,6 +41,7 @@ Some of the REXX exec's included are:
 
    ZFSADM   - perfrom several of the zfsadm functions
    ZFSALLOC - to allocate and format a new zFS (as a type 1.5)
+   ZFSAMNT  - report/view all automounted filesystems
    ZFSBACK  - to backup a zFS to a sequential dataset
               - uses IDCAMS REPRO
               - make backup to a gdg

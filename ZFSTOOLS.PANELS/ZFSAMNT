@@ -1,0 +1,26 @@
+)Attr Default(%+#)
+   ` type(output) intens(high) caps(off) just(left )
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+   @ type(text) intens(high) color(turq)
+   [ type(output) intens(high) caps(off) just(left ) color(turq)
+   ] type(output) intens(high) caps(off) just(left ) color(blue)
+   ! type(text) intens(high) color(blue)
+   { type(output) intens(high) caps(off) just(left ) color(white)
+   _ type(input) caps(on) just(left) color(white)
+)Body  Expand(\\)  Width(&zscreenw)
+%-\-\-~zFS Automountd%-\-\-
+%Command ===>#zcmd         \ \ %Scroll ===>#zcsr
+%
++Select to view filesystem
+%
+%S@File System
+%  Mount Point
+)Model
+_z[fs
+  {mount
++-\-\-
+)Init
+.zvars = '(zsel)'
+)Proc
+  ver (&zsel,list,S)
+)End
