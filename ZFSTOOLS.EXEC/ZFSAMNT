@@ -57,9 +57,9 @@
      'tbend' table
      end
   else do
-       zsel = null
        'tbtop' table
        do forever
+          zsel = null
           'tbdispl' table 'panel(zfsamnt)'
           if rc > 0 then leave
           if zsel /= 'S' then iterate
