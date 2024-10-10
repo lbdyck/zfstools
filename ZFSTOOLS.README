@@ -31,11 +31,19 @@ The backup and restore functions work with any unmounted zFS dataset and
 support using a GDG for the backup dataset if desired using relative GDG
 numbers.
 
-The dialog is accessed by starting with the ISPF Panel ZFSMENU.
+The dialog is accessed by starting with the ISPF Panel ZFSMENU,
+or using the ZFSTOOLS exec.
 
 To simplfy use you can edit the ZFSTOOLS exec to point to the install
 datasets (exec and panels) and then install just the ZFSTOOLS exec into
 an allocated library in your SYSPROC or SYSEXEC concatenation.
+
+Syntax for ZFSTOOLS exec:
+
+     %zfstools option
+
+     option is optional and if provided is the menu item number
+     e.g. %zfstools 15
 
 Some of the REXX exec's included are:
 

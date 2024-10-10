@@ -1,4 +1,21 @@
         /* rexx */
-
+        arg opt
+        if opt /= '' then do
+           if datatype(opt) /= 'NUM' then do
+              zedsmsg = 'Error.'
+              zedlmsg = opt 'is not in the range of 1 to 15' ,
+                 'try again....'
+              Address ISPExec 'Setmsg msg(isrz001)'
+              exit
+              end
+           if opt < 1 | opt > 15 then do
+              zedsmsg = 'Error.'
+              zedlmsg = opt 'is not in the range of 1 to 15' ,
+                 'try again....'
+              Address ISPExec 'Setmsg msg(isrz001)'
+              exit
+              end
+           opt = 'opt('opt')'
+           end
         address ispexec
-        "select panel(zfsmenu) newappl(isr) passlib"
+        "select panel(zfsmenu) newappl(isr) passlib" opt
