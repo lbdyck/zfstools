@@ -13,6 +13,7 @@
   *            zFS be mounted.                                 *
   *                                                            *
   * History:                                                   *
+  *            2024-07-15 - Clean up bpxwunix variables (drop) *
   *            2024-07-05 - Add in percentage usaged to display*
   *            2024-07-04 - Allow zfs dsname to be passed      *
   *                       - some restructure                   *
@@ -63,6 +64,7 @@ Do_It:
   address syscall 'geteuid'
   myeuid=retval
   Address syscall "seteuid 0"
+  drop stdout. stderr.
   rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
   rc = syscalls("OFF")
   Address syscall "seteuid" myeuid

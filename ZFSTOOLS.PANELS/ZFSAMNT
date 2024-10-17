@@ -6,7 +6,7 @@
    ] type(output) intens(high) caps(off) just(left ) color(blue)
    ! type(text) intens(high) color(blue)
    { type(output) intens(high) caps(off) just(left ) color(white)
-   _ type(input) caps(on) just(left) color(white)
+   _ type(input) caps(on) just(left) color(white) hilite(uscore)
 )Body  Expand(\\)  Width(&zscreenw)
 %-\-\-~zFS Automountd%-\-\-
 %Command ===>#zcmd         \ \ %Scroll ===>#zcsr
