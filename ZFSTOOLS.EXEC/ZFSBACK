@@ -12,6 +12,8 @@
  *            it will appear as unavailable or not found.     *
  *                                                            *
  * History:                                                   *
+ *            11/02/24 - Change test for existing zfs to      *
+ *                       use listdsi                          *
  *            05/19/16 - Support GDG output                   *
  *            05/13/16 - Creation                             *
  *                                                            *
@@ -31,9 +33,10 @@ Do_It:
 /* --------------------------------------------- *
  * Validate the source and target dataset status *
  * --------------------------------------------- */
- if sysdsn(zfsdsn) /= "OK" then do
+ x = listdsi(zfsdsn)
+ if x > 4 then do
     zedsmsg = ''
-    zedlmsg = 'Error:' zfsdsn sysdsn(zfsdan)
+    zedlmsg = sysmsglvl2
     "Setmsg msg(isrz001)"
     return
     end

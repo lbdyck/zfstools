@@ -9,6 +9,8 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            11/02/24 - Change test for existing zfs to      *
+ *                       use listdsi                          *
  *            05/19/16 - Support GDG                          *
  *            05/13/16 - Creation                             *
  *                                                            *
@@ -44,13 +46,15 @@ Do_It:
     "Setmsg msg(isrz001)"
     return
     end
- if zreplace /= 'Y' then
- if sysdsn(zfsdsn) = "OK" then do
-    zedsmsg = ''
-    zedlmsg = 'Error:' zfsdsn ,
-              "already exists and replace was not specified"
-    "Setmsg msg(isrz001)"
-    return
+ if zreplace /= 'Y' then do
+    x = listdsi(zfsdsn)
+    if x > 17 then do
+       zedsmsg = ''
+       zedlmsg = 'Error:' zfsdsn ,
+                 "already exists and replace was not specified"
+       "Setmsg msg(isrz001)"
+       return
+       end
     end
 
  Address TSO
