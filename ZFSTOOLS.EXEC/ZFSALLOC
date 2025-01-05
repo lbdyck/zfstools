@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            12/10/24 - Change sysdsn to listc ent           *
   *            07/07/24 - Correct stemedit title               *
   *                     - Replace STEMView with STEMEdit       *
   *            03/27/24 - Support Cyl and Megabyte allocations *
@@ -34,7 +35,12 @@ Do_It:
   /* ---------------------------------------------------- *
   * Verify that the requested zFS does not already exist *
   * ---------------------------------------------------- */
-  if sysdsn(zfsdsn) = "OK" then do
+  call outtrap 'x.'
+  Address TSO ,
+    'listc ent('zfsdsn')'
+  lrc = rc
+  call outtrap 'off'
+  if lrc = 0 then do
     zedsmsg = ''
     zedlmsg = "Error:" zfsdsn ,
       "already exists - specify a unique dataset name."
