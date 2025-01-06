@@ -10,6 +10,11 @@
 + zFS Backup:   !zfsback                                       +
 +    Replace:   !z+   Replace the backup dataset - Y or N
 +
++ Optional:
++   Data Class: !zfsdc                                      +
++   Mgmt Class: !zfsmc                                      +
++   Stor Class: !zfssc                                      +
++
 + Notes:   1. The zFS to backup should be unmounted
 +          2. The backup dataset name should not be a zFS as it is
 +             a sequential IDCAMS Unload file
@@ -25,4 +30,7 @@
   ver (&zfsdsn,nb,dsname)
   ver (&zfsback,nb,dsname)
   ver (&zreplace,nb,list,Y,N)
+  ver (&zfsdc,dsname)
+  ver (&zfsmc,dsname)
+  ver (&zfssc,dsname)
 )End

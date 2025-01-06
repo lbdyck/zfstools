@@ -12,6 +12,8 @@
  *            it will appear as unavailable or not found.     *
  *                                                            *
  * History:                                                   *
+ *            01/06/25 - Change blksize to 0                  *
+ *                     - add dc/mc/sc                         *
  *            11/02/24 - Change test for existing zfs to      *
  *                       use listdsi                          *
  *            05/19/16 - Support GDG output                   *
@@ -20,9 +22,13 @@
  * ---------------------------------------------------------- */
 
  Address ISPExec
+
+ 'vget (zfsdc zfsmc zfssc) profile'
+
  do forever
     "Display Panel(zfsback)"
     if rc > 4 then exit 0
+    'vput (zfsdc zfsmc zfssc) profile'
     sback = zfsback
     call do_it
     zfsback = sback
@@ -108,8 +114,15 @@ Do_It:
  * ---------------------------------- */
  if left(stype,1) = 'C' then stype = "CYL"
  if left(stype,1) = 'T' then stype = "TRKS"
+ parse value '' with classes null
+ if zfsdc /= null
+    then classes = classes 'Dataclas('zfsdc')'
+ if zfsmc /= null
+    then classes = classes 'Mgmtclas('zfsmc')'
+ if zfssc /= null
+    then classes = classes 'Storclas('zfssc')'
  "Alloc ds("zfsback") new spa("sprim","ssec")" stype "Release" ,
-       "RECFM(F B) BLKSIZE(20480) LRECL(4096)"
+       "RECFM(F B) BLKSIZE(0) LRECL(4096)" classes
  "Free  ds("zfsback")"
 
 /* ------------------------------------ *
