@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            03/14/25 - Replace sysdsn with listdsi          *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/16/16 - Creation                             *
  *                                                            *
@@ -29,9 +30,10 @@ Do_It:
 /* ------------------------------------ *
  * Verify that the requested zFS exists *
  * ------------------------------------ */
- if sysdsn(zfsdsn) /= "OK" then do
+ x = listdsi(zfsdsn)
+ if x > 4 then do
     zedsmsg = ''
-    zedlmsg = 'Error:' zfsdsn "does not exist."
+    zedlmsg = sysmsglvl2
     "Setmsg msg(isrz001)"
     return
     end
