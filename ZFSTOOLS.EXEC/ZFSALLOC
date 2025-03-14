@@ -9,6 +9,7 @@
   *                                                            *
   * History:                                                   *
   *            03/14/25 - Cleanup t. variable                  *
+  *                     - change from define to zfsadm         *
   *            12/10/24 - Change sysdsn to listc ent           *
   *            07/07/24 - Correct stemedit title               *
   *                     - Replace STEMView with STEMEdit       *
@@ -23,6 +24,8 @@
   *                                                            *
   * ---------------------------------------------------------- */
   parse value '' with null
+
+  rc = syscalls("ON")
 
   Address ISPExec
   do forever
@@ -49,36 +52,18 @@ Do_It:
     return
   end
 
-  Address TSO
-
   /* -------------- *
   * Define the zFS *
   * -------------- */
   Select
-    When atype = 'C' then stype = "CYLINDERS"
-    When atype = 'M' then stype = "MEGABYTES"
-    otherwise stype = 'CYLINDERS'
+    When atype = 'C' then stype = "-cylinders"
+    When atype = 'M' then stype = "-megabytes"
+    otherwise stype = '-cylinders'
     end
   parse value '' with dopt sopt mopt
-  if dcls /= null then dopt = "Dataclas("dcls")"
-  if mcls /= null then mopt = "Mgmtclas("mcls")"
-  if scls /= null then sopt = "Storclas("scls")"
-  drop t.
-  call outtrap 't.'
-  if zfsvol = null then vol = null
-  else vol = 'vol('zfsvol')'
-  say  "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
-    stype"("palc","salc")" vol
-  "Define Cluster (Name("zfsdsn") Linear"  dopt mopt sopt ,
-    stype"("palc","salc")" vol
-  drc = rc
-  call outtrap 'off'
-
-  if drc > 0 then call stemedit 'view',t.
-
-  /* -------------------------- *
-  * Now Format the zFS Dataset *
-  * -------------------------- */
+  if dcls /= null then dopt = "-dataclass" dcls
+  if mcls /= null then mopt = "-managementlass" mcls
+  if scls /= null then sopt = "-storageclass" scls
   if left(zfsdsn,1) = "'"
   then zfsdsnc = substr(zfsdsn,2,length(zfsdsn)-2)
   else do
@@ -86,13 +71,43 @@ Do_It:
     then zfsdsnc = zfsdsn
     else zfsdsnc = sysvar('syspref')'.'zfsdsn
   end
-  rc = syscalls("ON")
+  if zfsvol = null then vol = null
+  else vol = '-volumes' zfsvol
+  unixcmd = 'zfsadm define -aggregate' zfsdsnc dopt mopt sopt ,
+        stype palc salc vol
+
+  unixcmd = space(unixcmd)
+  drop stdout. stderr.
+  rc = bpxwunix(unixcmd,,stdout.,stderr.)
+  reprc = rc
+
+  c = 3
+  dashlen = length(unixcmd)
+  cmd.1 = copies('-',dashlen)
+  cmd.2 = unixcmd
+  cmd.3 = copies('-',dashlen)
+  do i = 1 to stdout.0
+     c = c + 1
+     cmd.c = stdout.i
+     end
+  cmd.0 = c
+
+  Address ISPExec 'vget (zfsview)'
+  if zfsview = '' then zfsview = 'Browse'
+  CALL stemedit zfsview,'cmd.',,,"zfs allocation"
+  if reprc > 0 then do
+  CALL stemedit zfsview,'stderr.',,,"zfs allocation error"
+  return
+  end
+
+  /* -------------------------- *
+  * Now Format the zFS Dataset *
+  * -------------------------- */
   unixcmd = "zfsadm format -aggr" zfsdsnc "-version5"
   drop stdout. stderr.
   rc = bpxwunix(unixcmd,,stdout.,stderr.)
   reprc = rc
-  rc = syscalls("OFF")
-  Address ISPExec 'vget (zfsview)'
+
   if zfsview = '' then zfsview = 'Browse'
   CALL stemedit zfsview,'stdout.',,,"zfs allocation"
 
