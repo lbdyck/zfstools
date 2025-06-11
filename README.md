@@ -40,6 +40,7 @@ Some of the REXX exec's included are:
   * uses IDCAMS REPRO
   * make backup to a gdg
   * Note that if the zFS to be backed up is mounted then the code, using the sysdsn() function, gets a dataset not found result. Strange but it does prevent an attempt to backup an active zFS.
+* ZFSCHAG  - Change the aggreate using the zfsadm chaggr command
 * ZFSCOPY  - Generate ADRDSSU JCL to copy a zFS
 * ZFSGROW  - Increase the size of a mounted zFS (requires SU authority)
 * ZFSIBM   - Exec to access some of the IBM zFS dialogs

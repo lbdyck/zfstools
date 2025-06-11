@@ -18,7 +18,7 @@
 %  9`lssys          +List systems
 % 10`shrink         +Shrink a zFS
 % 11`query          +Query menu
- +
+% 12`chaggr         +Change attributes of an aggregate
  +
  +
   %Current z/OS Level:@zosrl
@@ -48,6 +48,7 @@ ver (&zfsview,nb,list,Browse,View)
          9,'CMD(%zfsadm lssys        )'
         10,'CMD(%zfsshrk             )'
         11,'Panel(zfsquery)'
+        12,'CMD(%zfschag             )'
          ' ',' '
          *,'?' )
 )End

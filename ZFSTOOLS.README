@@ -57,6 +57,7 @@ Some of the REXX exec's included are:
                 the code, using the sysdsn() function, gets a dataset
                 not found result. Strange but it does prevent an
                 attempt to backup an active zFS.
+ * ZFSCHAG  - update the ZFS aggregate using the chaggr option
    ZFSCOPY  - Generate ADRDSSU JCL to copy a zFS
  * ZFSGROW  - increase the size of a mounted zFS
    ZFSIBM   - exec to access some of the IBM zFS dialogs
