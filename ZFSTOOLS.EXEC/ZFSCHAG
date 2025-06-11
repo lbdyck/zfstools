@@ -59,7 +59,10 @@ Do_It:
  myeuid=retval
  Address syscall "seteuid 0"
  drop stdout. stderr.
- rc = bpxwunix("echo zfsadm" option "&& zfsadm" option,,stdout.,stderr.)
+ cmd = "echo zfsadm" option ,
+       "&& echo" copies('-',70) ,
+       "&& zfsadm" option
+ rc = bpxwunix(cmd,,stdout.,stderr.)
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'

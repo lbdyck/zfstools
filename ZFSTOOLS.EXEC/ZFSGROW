@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            06/11/25 - improve reporting                    *
  *            03/14/25 - Replace sysdsn with listdsi          *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/16/16 - Creation                             *
@@ -39,12 +40,14 @@ Do_It:
     end
 
  Address TSO
- option = 'grow -aggregate' zfsdsn '-size' size
+ option = 'grow -aggregate' sysdsname '-size' size
  address syscall 'geteuid'
  myeuid=retval
  Address syscall "seteuid 0"
- rc = bpxwunix("zfsadm" option,,stdout.,stderr.)
- rc = syscalls("OFF")
+ cmd = "echo zfsadm" option ,
+       "&& echo" copies('-',70) ,
+       "&& zfsadm" option
+ rc = bpxwunix(cmd,,stdout.,stderr.)
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
