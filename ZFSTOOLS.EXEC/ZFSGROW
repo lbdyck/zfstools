@@ -19,11 +19,15 @@
  *                                                            *
  * ---------------------------------------------------------- */
 
+ parse value '' with null
+
  Address ISPExec
  do forever
     "Display Panel(zfsgrow)"
     if rc > 4 then exit 0
-    call do_it
+    if size = null
+       then call get_size
+       else call do_it
     Address ISPExec
     end
 
@@ -33,7 +37,7 @@ Do_It:
  * ------------------------------------ */
  x = listdsi(zfsdsn)
  if x > 4 then do
-    zedsmsg = ''
+    zedsmsg = null
     zedlmsg = sysmsglvl2
     "Setmsg msg(isrz001)"
     return
@@ -50,7 +54,7 @@ Do_It:
  rc = bpxwunix(cmd,,stdout.,stderr.)
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
- if zfsview = '' then zfsview = 'Browse'
+ if zfsview = null then zfsview = 'Browse'
     CALL stemedit zfsview,'stdout.',,,"zfsadm" option
  if stderr.0 > 0 then do
     do i = 1 to stderr.0
@@ -66,3 +70,31 @@ Do_It:
     CALL stemedit zfsview,'stem.',,,"zfsadm error" option
     end
  Return
+
+ FixUp_DSN:
+   if left(zfsdsn,1) = "'" then return
+   x = listdsi(zfsdsn)
+   zfsdsn = "'"sysdsname"'"
+   Return
+
+ Get_Size:
+   call fixup_dsn
+   hit = 0
+   if size = null then do
+     option = 'fsinfo -aggregate' zfsdsn '-full'
+     rc = bpxwunix("zfsadm" option,,s.,e.)
+     do i = 1 to s.0
+       if pos('  Size:',s.i) > 0 then do
+          parse value s.i with . 'Size:'csize .
+          csize = left(csize,length(csize)-1)
+          end
+       if pos('  Status:',s.i) > 0 then
+          if pos('NM',s.i) > 0 then do
+             csize = 'Not Mounted'
+             return
+             end
+     end
+     hit = 1
+     size = csize
+   end
+   Return
