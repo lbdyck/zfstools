@@ -8,12 +8,12 @@
 %
 + zFS Dataset:!zfsdsn                                        +
 +
-+ Size:!size    +in Kilobytes after the grow operation
-+                or 0 to use the Secondary Allocation value
++ Size:!size      +in Kilobytes after the grow operation
++                  or 0 to use the Secondary Allocation value
 +
-% Notes:        +1. The zFS%must+be mounted for grow to work
-+                2. You%must+have SuperUser capabilities to use this
-+                3. If%size+is blank then the current size will be calculated
+% Notes:          +1. The zFS%must+be mounted for grow to work
++                  2. You%must+have SuperUser capabilities to use this
++                  3. If%size+is blank then the current size will be calculated
 +
 )Init
  .cursor = zfsdsn
