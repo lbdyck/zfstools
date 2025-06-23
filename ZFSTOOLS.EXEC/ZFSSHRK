@@ -13,6 +13,7 @@
   *            zFS be mounted.                                 *
   *                                                            *
   * History:                                                   *
+  *            06/23/25 - Remove need for STEMEDIT             *
   *            2024-07-15 - Clean up bpxwunix variables (drop) *
   *            2024-07-05 - Add in percentage usaged to display*
   *            2024-07-04 - Allow zfs dsname to be passed      *
@@ -71,29 +72,44 @@ Do_It:
   Address ISPExec 'vget (zfsview)'
   if zfsview = null then zfsview = 'Browse'
   call stemedit zfsview,'stdout.',,,"zfsadm" option
+  do i = 1 to stdout.0
+     stem.i = stdout.i
+     end
+  stem.0 = i
+  ip = i + 1
   reason = null
   if stderr.0 > 0 then do
-    do i = 1 to stderr.0
+    do i = ip to stderr.0
       stem.i = stderr.i
       if pos('reason code=',stderr.i) > 0 then
       parse value stderr.i with . 'reason code='reason'.' .
     end
+    stem.0 = i
     if reason /= null then do
       call outtrap 'e.'
       'bpxmtext' reason
       call outtrap 'off'
-      i = stderr.0
-      i = i + 1
-      stderr.i = copies('-',60)
-      stderr.0 = i
+      i = stem.0 + 1
+      stem.i = copies('-',60)
       do ie = 1 to e.0
         i = i + 1
-        stderr.i = e.ie ' '
-        stderr.0 = i
+        stem.i = e.ie ' '
       end
+      stem.0 = i
     end
     CALL stemedit zfsview,'stderr.',,,"zfsadm error" option
-  end
+    dd = 'zfs' || random(9999)
+    'alloc f('dd') unit(3390) spa(15,15) tr' ,
+      'recfm(v b) lrecl(255) blksize(0)'
+    'execio * diskw' dd '(finis stem stem.'
+
+    Address ISPExec
+     'lminit dataid(ddb) ddname('dd')'
+     zfsview 'dataid('ddb')'
+     'lmfree dataid('ddb')'
+     Address TSO ,
+     'free f('dd')'
+     end
   if stdout.0 > 0 then do
     save_csize = csize
     save_size = size

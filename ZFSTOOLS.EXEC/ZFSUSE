@@ -3,6 +3,7 @@
 /*--------------------------------------------------------------------*/
 /* FLG  YYMMDD  USERID   DESCRIPTION                                  */
 /* ---  ------  -------  -------------------------------------------- */
+/* @L1  250623  LBD      Add option G (grow), use S for Shrink        */
 /* @LB  240708  LBD      Improve for shrink                           */
 /* @LX  210513  LBD      Remove special chars in zedlmsg              */
 /* @LT  180530  LBD      create a table view of the results           */
@@ -146,14 +147,15 @@
     zsel = null
     'tbdispl zfsuse panel(zfsusetb)'
     if rc > 0 then leave
-    if translate(zsel) = 'F' then do
-       if left(zfs,1) /= '*' then do
+    if left(zfs,1) /= '*' then
+    Select
+    When zsel = 'F' | zsel = 'S' then
        "select cmd(%zfsshrk '"strip(zfs)"')"
-       end
-       end
-    else if zsel /= null then do
+    When zsel = 'G' then
+       "select cmd(%zfsgrow '"strip(zfs)"')"
+    Otherwise
        'SELECT PGM(ISRDSLST) PARM(UDL' zmnt')'
-       end
+    end
     if zcmd /= '' then do
        parse value zcmd with zcmd options
        if abbrev("FIND",zcmd,1) = 1 then do

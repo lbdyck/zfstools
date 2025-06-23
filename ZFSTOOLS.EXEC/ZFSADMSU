@@ -9,6 +9,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            06/23/25 - Remove need for STEMEDIT             *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/16/16 - Creation                             *
  *                                                            *
@@ -23,7 +24,21 @@
  rc = syscalls("OFF")
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
- if zfsview = '' then zfsview = 'Browse'
-    CALL stemedit zfsview,'stdout.',,,"zfsadm" option
- if stderr.0 > 0 then
-    CALL stemedit zfsview,'stderr.',,,"zfsadm stderr" option
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(stem stdout.'
+ if stderr.0 > 0 then do
+    sep.0 = 3
+    sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
+    'execio * diskw' dd '(stem sep.'
+    'execio * diskw' dd '(stem stderr.'
+    end
+ 'execio 0 diskw' dd '(finis'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'

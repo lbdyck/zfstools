@@ -1,17 +1,28 @@
-/* --------------------  rexx procedure  -------------------- *
- * Name:      ZFSZLSOF                                        *
- *                                                            *
- * Function:  Display results of the zlsof query              *
- *                                                            *
- * Syntax:    %zfszlsof                                       *
- *                                                            *
- * Author:    Lionel B. Dyck                                  *
- *                                                            *
- * History:                                                   *
- *            05/07/23 - Creation                             *
- *                                                            *
- * ---------------------------------------------------------- */
-call outtrap 'zlsof.'
-'%zlsof -su -v'
-call outtrap 'off'
-call stemedit 'browse','zlsof.'
+  /* --------------------  rexx procedure  -------------------- *
+  * Name:      ZFSZLSOF                                        *
+  *                                                            *
+  * Function:  Display results of the zlsof query              *
+  *                                                            *
+  * Syntax:    %zfszlsof                                       *
+  *                                                            *
+  * Author:    Lionel B. Dyck                                  *
+  *                                                            *
+  * History:                                                   *
+  *            06/23/25 - Remove need for STEMEDIT             *
+  *            05/07/23 - Creation                             *
+  *                                                            *
+  * ---------------------------------------------------------- */
+  call outtrap 'zlsof.'
+  '%zlsof -su -v'
+  call outtrap 'off'
+  dd = 'zfs' || random(9999)
+  'alloc f('dd') unit(3390) spa(15,15) tr' ,
+    'recfm(v b) lrecl(255) blksize(0)'
+  'execio * diskw' dd '(finis stem zlsof.'
+
+  Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+    'free f('dd')'

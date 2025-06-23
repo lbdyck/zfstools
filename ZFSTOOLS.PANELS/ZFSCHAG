@@ -1,0 +1,84 @@
+)Attr Default(%+_)
+   ! type( input) intens(high) caps(on ) just(left ) hilite(uscore)
+     color(green)
+   ~ type(text) intens(high) color(turq)  hilite(reverse)
+)Body  Expand(\\)
+%-\-\-~zFS chaggr%-\-\-
+%Command ===>_zcmd
+%
++ zFS Aggregate:!zfsdsn                                        +(Dataset Name)
++
++ Select One ONLY:
++   aggrfull: !z !z +  %1-99 1-99, or 0 for Off
++                      +Threshold and Increment for reporting full error msgs
++   aggrgrow: !grow    %on or off
++                      +eligible to dynamically grow
++   share:    !share   %yes or no
++                      +make sysplex aware
++   ha:       !ha      %yes or no
++                      +requires high availability
++
+%Note:+1. You must have UID=0 or have SuperUser authority
++      2. The aggregate must also be mounted
++
+)Init
+ .cursor = zfsdsn
+ .zvars = '(thres incr)'
+)Proc
+&msg = &z
+&resp = .resp
+ver (&zfsdsn,nb,dsnameq)
+if (&resp NE END)
+  *REXX(* msg thold resp full)
+    if thres /= '' then do
+       if datatype(thres) = 'NUM' then
+       if thres < 0 | thres > 99
+       then msg = 'aggrfull thold must be between 1 and 99, or 0 for Off'
+       if msg = '' then do
+       if left(thres,1) = '0'
+          then thold = 'Off'
+          else thold = thres
+          end
+    if incr = '' then
+       if thold /= 'Off' then
+       msg = 'aggrfull increment must be between 1 and 99'
+    if incr /= '' then do
+       if datatype(incr) = 'NUM' then
+       if incr < 1 | incr > 99
+       then msg = 'aggrfull increment must be between 1 and 99'
+    end
+    if msg = '' then do
+       full = thold
+       if incr /= '' then
+       full = full','incr
+       end
+    end
+    if words(full grow share ha) = 0 then
+       msg = 'You *must* select at least one option'
+    if words(full grow share ha) > 1 then
+       msg = 'Select ONLY ONE option and try again.'
+    if grow /= '' then do
+       if left(grow,2) = 'ON'
+          then grow = 'ON'
+          else grow = 'OFF'
+       end
+    if ha /= '' then do
+       if left(ha,1) = 'Y'
+          then ha = 'YES'
+          else ha = 'NO'
+       end
+    if share /= '' then do
+       if left(share,1) = 'Y'
+          then share = 'YES'
+          else share = 'NO'
+       end
+  *ENDREXX
+  if (&msg EQ &Z)
+     ver (&grow,list,ON,OFF)
+     ver (&share,list,YES,NO)
+     ver (&ha,list,YES,NO)
+  if (&msg NE &Z)
+     &zedsmsg = ''
+     &zedlmsg = &msg
+     .msg = isrz001
+)End
