@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            06/23/25 - Remove need for STEMEDIT             *
  *            2025/06/11 - Creation                           *
  *                                                            *
  * ---------------------------------------------------------- */
@@ -64,9 +65,17 @@ Do_It:
        "&& zfsadm" option
  rc = bpxwunix(cmd,,stdout.,stderr.)
  Address syscall "seteuid" myeuid
+
+/* ------------------------------- *
+ | View the results of the command |
+ * ------------------------------- */
  Address ISPExec 'vget (zfsview)'
  if zfsview = '' then zfsview = 'Browse'
-    CALL stemedit zfsview,'stdout.',,,"zfsadm" option
+
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(stem stdout.'
  if stderr.0 > 0 then do
     do i = 1 to stderr.0
        stem.i = stderr.i
@@ -78,6 +87,17 @@ Do_It:
     i = i + 1
     stem.i = 'look up the error code and correct.'
     stem.0 = i
-    CALL stemedit zfsview,'stem.',,,"zfsadm error" option
     end
+    sep.0 = 3
+    sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
+    'execio * diskw' dd '(stem sep.'
+    'execio * diskw' dd '(stem stem.'
+ 'execio 0 diskw' dd '(finis'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'
  Return

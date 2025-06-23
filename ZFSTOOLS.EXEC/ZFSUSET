@@ -3,6 +3,7 @@
 /*--------------------------------------------------------------------*/
 /* FLG  YYMMDD  USERID   DESCRIPTION                                  */
 /* ---  ------  -------  -------------------------------------------- */
+/* @LX  250623  LBD      Remove use of stemedit                       */
 /* @LB  240707  LBD      Change stemview to stemedit                  */
 /* @LX  210513  LBD      Remove special chars from zedlmsg            */
 /* @PG  160615  LBD      updates from Peter Giles                     */
@@ -147,7 +148,18 @@ t.row = 'Total Filesystems Listed  =' l                         /* @LD */
 t.0 = row                                                       /* @LD */
 Address ISPExec 'vget (zfsview)'                                /* @PG */
 if zfsview = '' then zfsview = 'Browse'                         /* @PG */
-CALL stemedit zfsview,'t.',,,"zFS Usage Report"                 /* @PG */
+dd = 'zfs' || random(9999)
+Address TSO
+'alloc f('dd') unit(3390) spa(15,15) tr' ,
+  'recfm(v b) lrecl(255) blksize(0)'
+'execio * diskw' dd '(finis stem t.'
+
+Address ISPExec
+ 'lminit dataid(ddb) ddname('dd')'
+ zfsview 'dataid('ddb')'
+ 'lmfree dataid('ddb')'
+ Address TSO ,
+ 'free f('dd')'
 
 exit(0)
 

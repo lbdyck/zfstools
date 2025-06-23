@@ -15,13 +15,13 @@
   |                                                            |
   | Dependencies:                                              |
   |            1. ADRDSSU                                      |
-  |            2. Stemedit will be used                        |
-  |            3. SYS1.SBPXEXEC(ZLSOF) must be in SYSEXEC      |
+  |            2. SYS1.SBPXEXEC(ZLSOF) must be in SYSEXEC      |
   |               concatenation                                |
   |                                                            |
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
+  |            06/23/25 - Remove use of STEMEDIT               |
   |            01/05/24 - Updated to fix several issues        |
   |            10/31/16 - Update header to doc zlsof           |
   |            10/12/16 - Creation                             |
@@ -80,10 +80,20 @@
   sysin.13 = '/*'
   sysin.0  = 13
 
-  /* ----------------------------------------- *
-  | Invoke StemEdit to View the Generated JCL |
-  * ----------------------------------------- */
-  call stemedit 'View',sysin.,,,'Edit and Submit JCL',,80
+  /* --------------------- *
+  | Edit the generated JCL |
+  * ---------------------- */
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(finis stem sysin.'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  'view dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'
 
   Exit
 

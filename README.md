@@ -3,7 +3,6 @@
 2. Copy the PANELS members into a library in your ISPPLIB allocation.
 
 ## Dependencies
- - This ISPF dialog utilizes the STEMEDIT utility which can be found on the [CBTTape](https://www.cbttape.org/) FILE 183.
  - Some elements of the dialog require the user to have SuperUser capability.
  - The zLSOF option on the menu requires access to SYS1.SBPXEXEC where IBM ships this exec.
 

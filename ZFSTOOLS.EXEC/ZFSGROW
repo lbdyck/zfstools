@@ -3,7 +3,9 @@
  *                                                            *
  * Function:  Grow an existing zFS dataset                    *
  *                                                            *
- * Syntax:    %zfsgrow                                        *
+ * Syntax:    %zfsgrow zfsdsn                                 *
+ *                                                            *
+ *            zfsdsn is optional                              *
  *                                                            *
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
@@ -12,12 +14,16 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            06/23/25 - Remove need for STEMEDIT             *
+ *                     - allow passed zfsdsn                  *
  *            06/11/25 - improve reporting                    *
  *            03/14/25 - Replace sysdsn with listdsi          *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/16/16 - Creation                             *
  *                                                            *
  * ---------------------------------------------------------- */
+
+ arg zfsdsn
 
  parse value '' with null
 
@@ -54,8 +60,10 @@ Do_It:
  rc = bpxwunix(cmd,,stdout.,stderr.)
  Address syscall "seteuid" myeuid
  Address ISPExec 'vget (zfsview)'
- if zfsview = null then zfsview = 'Browse'
-    CALL stemedit zfsview,'stdout.',,,"zfsadm" option
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(stem stdout.'
  if stderr.0 > 0 then do
     do i = 1 to stderr.0
        stem.i = stderr.i
@@ -67,8 +75,16 @@ Do_It:
     i = i + 1
     stem.i = 'look up the error code and correct.'
     stem.0 = i
-    CALL stemedit zfsview,'stem.',,,"zfsadm error" option
+    'execio * diskw' dd '(stem stem.'
     end
+ 'execio 0 diskw' dd '(finis'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'
  Return
 
  FixUp_DSN:

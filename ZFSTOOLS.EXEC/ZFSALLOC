@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            06/23/25 - Remove need for STEMEDIT             *
   *            03/14/25 - Cleanup t. variable                  *
   *                     - change from define to zfsadm         *
   *            12/10/24 - Change sysdsn to listc ent           *
@@ -39,6 +40,7 @@ Do_It:
   /* ---------------------------------------------------- *
   * Verify that the requested zFS does not already exist *
   * ---------------------------------------------------- */
+  drop stdout. stderr.
   call outtrap 'x.'
   Address TSO ,
     'listc ent('zfsdsn')'
@@ -59,7 +61,7 @@ Do_It:
     When atype = 'C' then stype = "-cylinders"
     When atype = 'M' then stype = "-megabytes"
     otherwise stype = '-cylinders'
-    end
+  end
   parse value '' with dopt sopt mopt
   if dcls /= null then dopt = "-dataclass" dcls
   if mcls /= null then mopt = "-managementlass" mcls
@@ -74,7 +76,7 @@ Do_It:
   if zfsvol = null then vol = null
   else vol = '-volumes' zfsvol
   unixcmd = 'zfsadm define -aggregate' zfsdsnc dopt mopt sopt ,
-        stype palc salc vol
+    stype palc salc vol
 
   unixcmd = space(unixcmd)
   drop stdout. stderr.
@@ -87,18 +89,31 @@ Do_It:
   cmd.2 = unixcmd
   cmd.3 = copies('-',dashlen)
   do i = 1 to stdout.0
-     c = c + 1
-     cmd.c = stdout.i
-     end
+    c = c + 1
+    cmd.c = stdout.i
+  end
   cmd.0 = c
 
+
+  /* ------------------------------- *
+  | View the results of the command |
+  * ------------------------------- */
   Address ISPExec 'vget (zfsview)'
   if zfsview = '' then zfsview = 'Browse'
-  CALL stemedit zfsview,'cmd.',,,"zfs allocation"
-  if reprc > 0 then do
-  CALL stemedit zfsview,'stderr.',,,"zfs allocation error"
-  return
-  end
+
+  Address TSO
+  dd = 'zfs' || random(9999)
+  'alloc f('dd') unit(3390) spa(15,15) tr' ,
+    'recfm(v b) lrecl(255) blksize(0)'
+  'execio * diskw' dd '(finis stem cmd.'
+
+  Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+    'free f('dd')'
+  if reprc > 0 then return
 
   /* -------------------------- *
   * Now Format the zFS Dataset *
@@ -109,6 +124,24 @@ Do_It:
   reprc = rc
 
   if zfsview = '' then zfsview = 'Browse'
-  CALL stemedit zfsview,'stdout.',,,"zfs allocation"
+
+  Address TSO
+  'alloc f('dd') unit(3390) spa(15,15) tr' ,
+    'recfm(v b) lrecl(255) blksize(0)'
+  'execio * diskw' dd '(stem stdout.'
+  if stderr.0 > 0 then do
+    sep.0 = 3
+    sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
+    'execio * diskw' dd '(stem sep.'
+    'execio * diskw' dd '(stem stderr.'
+  end
+  'execio 0 diskw' dd '(finis'
+
+  Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+    'free f('dd')'
 
   return

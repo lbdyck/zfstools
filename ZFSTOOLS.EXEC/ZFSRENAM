@@ -8,6 +8,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            06/23/25 - Remove need for STEMEDIT             *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/21/16 - Correction for fully qualified dsns  *
  *            05/18/16 - Creation                             *
@@ -77,8 +78,23 @@ Do_It:
    end
  c.0 = cn
 
+
+/* ------------------------------- *
+ | View the results of the command |
+ * ------------------------------- */
  Address ISPExec 'vget (zfsview)'
- if zfsview = '' then zfsview = 'view'
- CALL stemedit zfsview,'c.',,,"zFS Rename"
+ if zfsview = '' then zfsview = 'Browse'
+
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(finis stem c.'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'
 
  return

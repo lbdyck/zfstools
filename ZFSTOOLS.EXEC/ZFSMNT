@@ -77,12 +77,32 @@ Do_It:
  rc = bpxwunix(option,,stdout.,stderr.)
  rc = syscalls("OFF")
  Address syscall "seteuid" myeuid
+
+/* ------------------------------- *
+ | View the results of the command |
+ * ------------------------------- */
  Address ISPExec 'vget (zfsview)'
- if zfsview = null then zfsview = 'Browse'
- if stdout.0 > 0 then
-    CALL stemedit zfsview,'stdout.',,,"zfs mount" option
- if stderr.0 > 0 then
-    CALL stemedit zfsview,'stderr.',,,"zfs mount error" option
+ if zfsview = '' then zfsview = 'Browse'
+
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(stem stdout.'
+ if stderr.0 > 0 then do
+    sep.0 = 3
+    sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
+    'execio * diskw' dd '(stem sep.'
+    'execio * diskw' dd '(stem stderr.'
+    end
+ 'execio 0 diskw' dd '(finis'
+
+ Address ISPExec
+  'lminit dataid(ddb) ddname('dd')'
+  zfsview 'dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO ,
+  'free f('dd')'
+
  if stdout.0 + stderr.0 = 0 then do
     zedsmsg = ''
     zedlmsg = zfsdsn "was successfully mounted on:" zfspath
