@@ -8,6 +8,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            06/25/25 - Display command in report            *
  *            06/23/25 - Remove need for STEMEDIT             *
  *                     - check for null stems before viewing  *
  *            07/07/24 - Replace STEMView with STEMEdit       *
@@ -62,6 +63,10 @@
  dd = 'zfs' || random(9999)
  'alloc f('dd') unit(3390) spa(15,15) tr' ,
    'recfm(v b) lrecl(255) blksize(0)'
+ c.1 = 'zfsadm' option
+ c.2 = copies('-',72)
+ c.0 = 2
+ 'execio * diskw' dd '(stem c.'
  'execio * diskw' dd '(stem stdout.'
  if stderr.0 > 0 then do
     sep.0 = 3

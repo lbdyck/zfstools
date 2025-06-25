@@ -8,17 +8,18 @@
 %Option ===>_zcmd
 %
 %  1`aggrinfo       +Obtain information on an attached aggregate
-%  2`configquery    +Query configuration settings for the zFS kernel
-%  3`fsinfo         +Obtain file system information
-%  4`grow           +Grow a zFS (requires SuperUser)
-%  5`help           +Get help on commands
-%  6`level          +Display service level
-%  7`lsaggr         +List aggregates
-%  8`lsfs           +List filesystem information
-%  9`lssys          +List systems
-% 10`shrink         +Shrink a zFS
-% 11`query          +Query menu
-% 12`chaggr         +Change attributes of an aggregate
+%  2`chaggr         +Change attributes of an aggregate
+%  3`configquery    +Query configuration settings for the zFS kernel
+%  4`define         +Allocate/Define a new ZFS
+%  5`fsinfo         +Obtain file system information
+%  6`grow           +Grow a zFS (requires SuperUser)
+%  7`help           +Get help on commands
+%  8`level          +Display service level
+%  9`lsaggr         +List aggregates
+% 10`lsfs           +List filesystem information
+% 11`lssys          +List systems
+% 12`shrink         +Shrink a zFS
+% 13`query          +Query menu
  +
  +
   %Current z/OS Level:@zosrl
@@ -38,17 +39,18 @@
 ver (&zfsview,nb,list,Browse,View)
 &ZSEL = TRANS (TRUNC (&ZCMD,'.')
          1,'CMD(%zfsadm aggrinfo -long   )'
-         2,'CMD(%zfsadm configquery -all )'
-         3,'CMD(%zfsadm fsinfo -all  )'
-         4,'CMD(%zfsgrow)'
-         5,'CMD(%zfsadm help         )'
-         6,'CMD(%zfsadm level        )'
-         7,'CMD(%zfsadm lsaggr       )'
-         8,'CMD(%zfsadm lsfs         )'
-         9,'CMD(%zfsadm lssys        )'
-        10,'CMD(%zfsshrk             )'
-        11,'Panel(zfsquery)'
-        12,'CMD(%zfschag             )'
+         2,'CMD(%zfschag             )'
+         3,'CMD(%zfsadm configquery -all )'
+         4,'CMD(%zfsalloc            )'
+         5,'CMD(%zfsadm fsinfo -all  )'
+         6,'CMD(%zfsgrow)'
+         7,'CMD(%zfsadm help         )'
+         8,'CMD(%zfsadm level        )'
+         9,'CMD(%zfsadm lsaggr       )'
+        10,'CMD(%zfsadm lsfs         )'
+        11,'CMD(%zfsadm lssys        )'
+        12,'CMD(%zfsshrk             )'
+        13,'Panel(zfsquery)'
          ' ',' '
          *,'?' )
 )End

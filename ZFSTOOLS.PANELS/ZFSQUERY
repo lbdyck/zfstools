@@ -6,16 +6,17 @@
 )Body  Expand(\\)
 %-\-\-~zfsadm query Tools%-\-\-
 %Option ===>_zcmd
-%
-%  1`ctkc                     %  9`metacache
-%  2`dircache                 % 10`stkm
-%  3`iobyaggregate            % 11`storage
-%  4`iobydasd                 % 12`svi
-%  5`iocounts                 % 13`trancache
-%  6`knpfs                    % 14`usercache
-%  7`locking                  % 15`vnodecache
-%  8`logcache                 %
  +
+%  1`compression               %11`locking
+%  2`ctkc                      %12`logcache
+%  3`dircache                  %13`metacache
+%  4`help                      %14`stkm
+%  5`iobyaggregate             %15`storage
+%  6`iobydasd                  %16`svi
+%  7`iocounts                  %17`trancache
+%  8`knpfs                     %18`usercache
+%  9`knpfs                     %19`vnodecache
+% 10`level
  +
  +
 %  Browse or View Results:$zfsview +Browse or View
@@ -32,21 +33,25 @@
  &zfsview = trans(trunc(&zfsview,1) B,Browse V,View *,*)
  ver (&zfsview,nb,list,Browse,View)
  &ZSEL = TRANS (TRUNC (&ZCMD,'.')
-         1,'CMD(%zfsadm query -ctkc                  )'
-         2,'CMD(%zfsadm query -dircache              )'
-         3,'CMD(%zfsadm query -iobyaggregate         )'
-         4,'CMD(%zfsadm query -iobydasd              )'
-         5,'CMD(%zfsadm query -iocounts              )'
-         6,'CMD(%zfsadm query -knpfs                 )'
-         7,'CMD(%zfsadm query -locking               )'
-         8,'CMD(%zfsadm query -logcache              )'
-         9,'CMD(%zfsadm query -metacache             )'
-        10,'CMD(%zfsadm query -stkm                  )'
-        11,'CMD(%zfsadm query -storage               )'
-        12,'CMD(%zfsadm query -svi                   )'
-        13,'CMD(%zfsadm query -trancache             )'
-        14,'CMD(%zfsadm query -usercache             )'
-        15,'CMD(%zfsadm query -vnodecache            )'
+         1,'CMD(%zfsadm query -compression       )'
+         2,'CMD(%zfsadm query -ctkc              )'
+         3,'CMD(%zfsadm query -dircache          )'
+         4,'CMD(%zfsadm query -help              )'
+         5,'CMD(%zfsadm query -iobyaggregate     )'
+         6,'CMD(%zfsadm query -iobydasd          )'
+         7,'CMD(%zfsadm query -iocounts          )'
+         8,'CMD(%zfsadm query -knpfs             )'
+         9,'CMD(%zfsadm query -knpfs             )'
+        10,'CMD(%zfsadm query -level             )'
+        11,'CMD(%zfsadm query -locking           )'
+        12,'CMD(%zfsadm query -logcache          )'
+        13,'CMD(%zfsadm query -metacache         )'
+        14,'CMD(%zfsadm query -stkm              )'
+        15,'CMD(%zfsadm query -storage           )'
+        16,'CMD(%zfsadm query -svi               )'
+        17,'CMD(%zfsadm query -trancache         )'
+        18,'CMD(%zfsadm query -usercache         )'
+        19,'CMD(%zfsadm query -vnodecache        )'
          ' ',' '
          *,'?' )
 )End
