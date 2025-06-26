@@ -8,6 +8,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            06/26/25 - Display zfsadm menu if no option     *
  *            06/25/25 - Display command in report            *
  *            06/23/25 - Remove need for STEMEDIT             *
  *                     - check for null stems before viewing  *
@@ -20,6 +21,14 @@
  parse arg option
  option = translate(option,"abcdefghijklmnopqrstuvwxyz", ,
                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+/* ------------------------------------ *
+ | If no option then display menu panel |
+ * ------------------------------------ */
+ if option = '' then do
+    address ispexec 'select panel(zfsadm) newappl(isr) passlib'
+    exit 0
+    end
 
 /* ------------------------------------- *
  * Test for z/OS 2.2 or newer for fsinfo *

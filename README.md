@@ -26,7 +26,11 @@ The backup and restore functions work with any unmounted zFS dataset and
 support using a GDG for the backup dataset if desired using relative GDG
 numbers.
 
-The dialog is accessed by starting with the ISPF Panel ZFSMENU.
+The dialog is accessed by starting with the ISPF Panel ZFSMENU. Which
+is displayed by the %zfstools command.
+
+If only the zfsadm dialogs are to be used then access via %zfsadm will
+display the zfsadm menu.
 
 To simplfy use you can edit the ZFSTOOLS exec to point to the install
 datasets (exec and panels) and then install just the ZFSTOOLS exec into
