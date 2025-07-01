@@ -12,6 +12,7 @@
  *            be mounted.                                     *
  *                                                            *
  * History:                                                   *
+ *            07/01/25 - Add generated command to report      *
  *            06/23/25 - Remove need for STEMEDIT             *
  *            07/07/24 - Replace STEMView with STEMEdit       *
  *            05/19/16 - Support z/OS 2.1 and 2.2+            *
@@ -68,6 +69,9 @@ Do_It:
  dd = 'zfs' || random(9999)
  'alloc f('dd') unit(3390) spa(15,15) tr' ,
    'recfm(v b) lrecl(255) blksize(0)'
+ c.0 = 1
+ c.1 = option
+ 'execio * diskw' dd '(stem c.'
  'execio * diskw' dd '(stem stdout.'
  if stderr.0 > 0 then do
     sep.0 = 3
