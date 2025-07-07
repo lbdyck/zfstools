@@ -10,26 +10,31 @@
 + zFS Backup:   !zfsback                                       +
 +    Replace:   !z+   Replace the backup dataset - Y or N
 +
++ Online or Batch:!z+%O+Online or%B+Batch
++
 + Optional:
 +   Data Class: !zfsdc                                      +
 +   Mgmt Class: !zfsmc                                      +
 +   Stor Class: !zfssc                                      +
 +
-+ Notes:   1. The zFS to backup should be unmounted
-+          2. The backup dataset name should not be a zFS as it is
++ Notes:   1. The zFS to backup%must+be unmounted
++          2. The backup dataset name%must+not be a zFS as it is
 +             a sequential IDCAMS Unload file
 +          3. If the backup dataset exists and replace is specified
 +             then it will be deleted prior to the backup
 +          4. The backup dataset name may be a GDG
 )Init
  .cursor = zfsdsn
- .zvars = '(zreplace)'
+ .zvars = '(zreplace zwhere)'
  if (&zreplace = &Z)
     &zreplace = 'Y'
+ if (&zwhere = &Z)
+    &zwhere = 'O'
 )Proc
   ver (&zfsdsn,nb,dsname)
   ver (&zfsback,nb,dsname)
   ver (&zreplace,nb,list,Y,N)
+  ver (&zwhere,nb,list,O,B)
   ver (&zfsdc,dsname)
   ver (&zfsmc,dsname)
   ver (&zfssc,dsname)

@@ -1,7 +1,10 @@
-)BODY WINDOW(40,4)
+)ATTR
+ @ type(output) intens(low) caps(off)
+)BODY WINDOW(60,5)
 +
-% &MSG1
-% &MSG2
+% @msg1
+% @msg2
+% @msg3
 +
 )INIT
   &ZWINTTL = &Z

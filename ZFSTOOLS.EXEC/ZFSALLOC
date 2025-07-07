@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            07/07/25 - Improve messzging                    *
   *            06/23/25 - Remove need for STEMEDIT             *
   *            03/14/25 - Cleanup t. variable                  *
   *                     - change from define to zfsadm         *
@@ -94,7 +95,6 @@ Do_It:
   end
   cmd.0 = c
 
-
   /* ------------------------------- *
   | View the results of the command |
   * ------------------------------- */
@@ -109,6 +109,9 @@ Do_It:
 
   Address ISPExec
   'lminit dataid(ddb) ddname('dd')'
+  zedsmsg = null
+  zedlmsg = 'Press F3 to continue.'
+  'setmsg msg(isrz001)'
   zfsview 'dataid('ddb')'
   'lmfree dataid('ddb')'
   Address TSO ,
@@ -118,6 +121,12 @@ Do_It:
   /* -------------------------- *
   * Now Format the zFS Dataset *
   * -------------------------- */
+  msg1 = 'Performing zfsadm format of:'
+  msg2 = zfsdsnc
+  msg3 = 'Press ENTER to continue.'
+  'addpop'
+  'display panel(zfsusem)'
+  'rempop'
   unixcmd = "zfsadm format -aggr" zfsdsnc "-version5"
   drop stdout. stderr.
   rc = bpxwunix(unixcmd,,stdout.,stderr.)

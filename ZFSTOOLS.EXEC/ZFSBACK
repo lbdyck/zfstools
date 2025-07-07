@@ -12,6 +12,8 @@
  *            it will appear as unavailable or not found.     *
  *                                                            *
  * History:                                                   *
+ *            07/04/25 - Clean up JCL "generation"            *
+ *            07/01/25 - Add background (JCL) option          *
  *            01/06/25 - Change blksize to 0                  *
  *                     - add dc/mc/sc                         *
  *            11/02/24 - Change test for existing zfs to      *
@@ -23,12 +25,12 @@
 
  Address ISPExec
 
- 'vget (zfsdc zfsmc zfssc) profile'
+ 'vget (zfsdc zfsmc zfssc zwhere) profile'
 
  do forever
     "Display Panel(zfsback)"
     if rc > 4 then exit 0
-    'vput (zfsdc zfsmc zfssc) profile'
+    'vput (zfsdc zfsmc zfssc zwhere) profile'
     sback = zfsback
     call do_it
     zfsback = sback
@@ -76,7 +78,9 @@ Do_It:
 
 /* ------------------------------------ *
  * Add support for a GDG output dataset *
+ * but only needed for Online backup    *
  * ------------------------------------ */
+ if zwhere = 'O' then
  if pos('(+',zfsback) > 0 then do
     parse value zfsback with zfsback'(' .
     if left(zfsback,1) = "'" then zfsback = zfsback"'"
@@ -113,7 +117,7 @@ Do_It:
  * Allocate the backup unload dataset *
  * ---------------------------------- */
  if left(stype,1) = 'C' then stype = "CYL"
- if left(stype,1) = 'T' then stype = "TRKS"
+ if left(stype,1) = 'T' then stype = "TRK"
  parse value '' with classes null
  if zfsdc /= null
     then classes = classes 'Dataclas('zfsdc')'
@@ -121,6 +125,11 @@ Do_It:
     then classes = classes 'Mgmtclas('zfsmc')'
  if zfssc /= null
     then classes = classes 'Storclas('zfssc')'
+
+  /* ---------------------- *
+   | If Online then do this |
+   * ---------------------- */
+   if zwhere = 'O' then do
  "Alloc ds("zfsback") new spa("sprim","ssec")" stype "Release" ,
        "RECFM(F B) BLKSIZE(0) LRECL(4096)" classes
  "Free  ds("zfsback")"
@@ -136,5 +145,64 @@ Do_It:
  zedlmsg = left("Repro completed with a return code of:" reprc ,72) ,
             t.1
  Address ISPExec "Setmsg msg(isrz001)"
+ end
+ else do  /* do batch JCL */
+  /* ------------- *
+  | Build the JCL |
+  * ------------- */
+  drop sysin.
+  sc = 0
+  call add_sysin '//'sysvar('sysuid') ' JOB ...'
+  call add_sysin '//    NOTIFY='sysvar('sysuid')',REGION=0M,MSGCLASS=(1,1)'
+  call add_sysin '//OUT OUTPUT DEFAULT=YES,JESDS=ALL,OUTDISP=(HOLD,HOLD)'
+  call add_sysin '//ZFSBACK  EXEC PGM=IDCAMS'
+  call add_sysin '//SYSPRINT DD SYSOUT=*'
+  call add_sysin '//BACKDD   DD DSN='zfsback',DISP=(NEW,CATLG),'
+  call add_sysin '//   SPACE=('stype',('sprim','ssec'),RLSE),'
+  call add_sysin '//   DCB=(RECFM=FB,LRECL=4096,BLKSIZE=0)'
+  if zfsdc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   DATACLAS='zfsdc
+     end
+  if zfsmc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   MGMTCLAS='zfsmc
+     end
+  if zfssc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   MGMTCLAS='zfssc
+     end
+  call add_sysin '//SYSIN DD *'
+  call add_sysin ' Repro indataset('zfsdsn') outdataset('zfsback')'
+  call add_sysin '/*'
+  sysin.0  = sc
 
+  /* --------------------- *
+  | Edit the generated JCL |
+  * ---------------------- */
+ dd = 'zfs' || random(9999)
+ 'alloc f('dd') unit(3390) spa(15,15) tr' ,
+   'recfm(v b) lrecl(255) blksize(0)'
+ 'execio * diskw' dd '(finis stem sysin.'
+
+ Address ISPExec
+ zedsmsg = null
+ zedlmsg = 'Update the JCL and then Submit (or save somewhere):'
+ "Setmsg msg(isrz001)"
+
+  'lminit dataid(ddb) ddname('dd')'
+  'view dataid('ddb')'
+  'lmfree dataid('ddb')'
+  Address TSO
+  'free f('dd')'
+ end
  return
+
+  /* --------------------------------- *
+   | Add the JCL statement to the stem |
+   * --------------------------------- */
+Add_Sysin:
+  parse arg data
+  sc = sc + 1
+  sysin.sc = data
+  return
