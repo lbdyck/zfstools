@@ -8,7 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
-  *            07/07/25 - Improve messzging                    *
+  *            07/08/25 - Improve messzging                    *
   *            06/23/25 - Remove need for STEMEDIT             *
   *            03/14/25 - Cleanup t. variable                  *
   *                     - change from define to zfsadm         *
@@ -100,34 +100,35 @@ Do_It:
   * ------------------------------- */
   Address ISPExec 'vget (zfsview)'
   if zfsview = '' then zfsview = 'Browse'
-
-  Address TSO
   dd = 'zfs' || random(9999)
+
+  if reprc > 0 then do
+  Address TSO
   'alloc f('dd') unit(3390) spa(15,15) tr' ,
     'recfm(v b) lrecl(255) blksize(0)'
   'execio * diskw' dd '(finis stem cmd.'
 
   Address ISPExec
   'lminit dataid(ddb) ddname('dd')'
-  zedsmsg = null
-  zedlmsg = 'Press F3 to continue.'
-  'setmsg msg(isrz001)'
   zfsview 'dataid('ddb')'
   'lmfree dataid('ddb')'
   Address TSO ,
     'free f('dd')'
-  if reprc > 0 then return
+  return
+  end
 
   /* -------------------------- *
   * Now Format the zFS Dataset *
   * -------------------------- */
-  msg1 = 'Performing zfsadm format of:'
+  msg1 = 'ZFS Allocated:'
   msg2 = zfsdsnc
-  msg3 = 'Press ENTER to continue.'
+  msg3 = 'Performing zfsadm format now.'
+  'control display lock'
   'addpop'
   'display panel(zfsusem)'
   'rempop'
   unixcmd = "zfsadm format -aggr" zfsdsnc "-version5"
+
   drop stdout. stderr.
   rc = bpxwunix(unixcmd,,stdout.,stderr.)
   reprc = rc
@@ -137,10 +138,16 @@ Do_It:
   Address TSO
   'alloc f('dd') unit(3390) spa(15,15) tr' ,
     'recfm(v b) lrecl(255) blksize(0)'
+  'execio * diskw' dd '(stem cmd.'
+   sep.0 = 3
+   sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
+  'execio * diskw' dd '(stem sep.'
+  drop cmd.
+  cmd.1 = unixcmd
+  cmd.0 = 1
+  'execio * diskw' dd '(stem cmd.'
   'execio * diskw' dd '(stem stdout.'
   if stderr.0 > 0 then do
-    sep.0 = 3
-    sep.1 = ' '; sep.2 = copies('-',70); sep.3 = ' '
     'execio * diskw' dd '(stem sep.'
     'execio * diskw' dd '(stem stderr.'
   end
