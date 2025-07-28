@@ -8,6 +8,7 @@
   * Author:    Lionel B. Dyck                                  *
   *                                                            *
   * History:                                                   *
+  *            07/28/25 - Fix missing variable zfsview         *
   *            06/23/25 - Remove need for STEMEDIT             *
   *            05/07/23 - Creation                             *
   *                                                            *
@@ -21,6 +22,8 @@
   'execio * diskw' dd '(finis stem zlsof.'
 
   Address ISPExec
+  'vget (zfsview)'
+  if zfsview = '' then zfsview = 'Browse'
   'lminit dataid(ddb) ddname('dd')'
   zfsview 'dataid('ddb')'
   'lmfree dataid('ddb')'
