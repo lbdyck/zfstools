@@ -21,7 +21,7 @@
   | Author:    Lionel B. Dyck                                  |
   |                                                            |
   | History:  (most recent on top)                             |
-  |            02/18/25 - Fix MSGCLASS to MSGLEVEL             |
+  |            02/18/26 - Fix MSGCLASS to MSGLEVEL             |
   |            06/23/25 - Remove use of STEMEDIT               |
   |            01/05/24 - Updated to fix several issues        |
   |            10/31/16 - Update header to doc zlsof           |
@@ -73,9 +73,9 @@
   sysin.5  = '//SYSPRINT DD SYSOUT=*'
   sysin.6  = '//SYSIN    DD *'
   sysin.7  = ' COPY DATASET( - '
-  sysin.8  = '      INCLUDE('fromzfsw')) -'
-  sysin.9  = '      RENAMEU('fromzfsw', -'
-  sysin.10 = '              'tozfsw') -'
+  sysin.8  = '      INCLUDE('translate(fromzfsw)')) -'
+  sysin.9  = '      RENAMEU('translate(fromzfsw)', -'
+  sysin.10 = '              'translate(tozfsw)') -'
   sysin.11 = '      CATALOG ALLDATA(*) ALLEXCP -'
   sysin.12 = '      CANCELERROR TOLERATE(ENQF)'
   sysin.13 = '/*'

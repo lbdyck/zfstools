@@ -12,7 +12,7 @@
  *            it will appear as unavailable or not found.     *
  *                                                            *
  * History:                                                   *
- *            02/18/25 - Fix MSGCLASS to MSGLEVEL             *
+ *            02/18/26 - Fix MSGCLASS to MSGLEVEL             *
  *            07/04/25 - Clean up JCL "generation"            *
  *            07/01/25 - Add background (JCL) option          *
  *            01/06/25 - Change blksize to 0                  *
@@ -205,5 +205,5 @@ Do_It:
 Add_Sysin:
   parse arg data
   sc = sc + 1
-  sysin.sc = data
+  sysin.sc = translate(data)
   return

@@ -9,7 +9,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
- *            02/18/25 - Fix MSGCLASS to MSGLEVEL             *
+ *            02/18/26 - Fix MSGCLASS to MSGLEVEL             *
  *            11/02/24 - Change test for existing zfs to      *
  *                       use listdsi                          *
  *            05/19/16 - Support GDG                          *
@@ -155,7 +155,7 @@ Do_It:
 Add_Sysin:
   parse arg data
   sc = sc + 1
-  sysin.sc = data
+  sysin.sc = translate(data)
   return
 
   /* -------------- *
