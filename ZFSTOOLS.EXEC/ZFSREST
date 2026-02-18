@@ -9,6 +9,7 @@
  * Author:    Lionel B. Dyck                                  *
  *                                                            *
  * History:                                                   *
+ *            02/18/25 - Fix MSGCLASS to MSGLEVEL             *
  *            11/02/24 - Change test for existing zfs to      *
  *                       use listdsi                          *
  *            05/19/16 - Support GDG                          *
@@ -147,3 +148,46 @@ Do_It:
                          else gdgdsn = newdsn
  Address ISPExec
  return
+
+  /* --------------------------------- *
+   | Add the JCL statement to the stem |
+   * --------------------------------- */
+Add_Sysin:
+  parse arg data
+  sc = sc + 1
+  sysin.sc = data
+  return
+
+  /* -------------- *
+   | For future use |
+   * -------------- */
+ else do  /* do batch JCL */
+  /* ------------- *
+  | Build the JCL |
+  * ------------- */
+  drop sysin.
+  sc = 0
+  call add_sysin '//'sysvar('sysuid') ' JOB ...'
+  call add_sysin '//    NOTIFY='sysvar('sysuid')',REGION=0M,MSGLEVEL=(1,1)'
+  call add_sysin '//OUT OUTPUT DEFAULT=YES,JESDS=ALL,OUTDISP=(HOLD,HOLD)'
+  call add_sysin '//ZFSBACK  EXEC PGM=IDCAMS'
+  call add_sysin '//SYSPRINT DD SYSOUT=*'
+  call add_sysin '//BACKDD   DD DSN='zfsback',DISP=(NEW,CATLG),'
+  call add_sysin '//   SPACE=('stype',('sprim','ssec'),RLSE),'
+  call add_sysin '//   DCB=(RECFM=FB,LRECL=4096,BLKSIZE=0)'
+  if zfsdc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   DATACLAS='zfsdc
+     end
+  if zfsmc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   MGMTCLAS='zfsmc
+     end
+  if zfssc /= null then do
+     sysin.sc = sysin.sc','
+     call add_sysin '//   MGMTCLAS='zfssc
+     end
+  call add_sysin '//SYSIN DD *'
+  call add_sysin ' Repro indataset('zfsdsn') outdataset('zfsback')'
+  call add_sysin '/*'
+  sysin.0  = sc
