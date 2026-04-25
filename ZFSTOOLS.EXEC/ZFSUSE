@@ -3,6 +3,8 @@
 /*--------------------------------------------------------------------*/
 /* FLG  YYMMDD  USERID   DESCRIPTION                                  */
 /* ---  ------  -------  -------------------------------------------- */
+/* @L2  260425  LBD      Check zcmd for null before checking zsel     */
+/*                       Bypass /PROC filesystem                      */
 /* @L1  250623  LBD      Add option G (grow), use S for Shrink        */
 /* @LB  240708  LBD      Improve for shrink                           */
 /* @LX  210513  LBD      Remove special chars in zedlmsg              */
@@ -147,6 +149,7 @@
     zsel = null
     'tbdispl zfsuse panel(zfsusetb)'
     if rc > 0 then leave
+    if zcmd = null then
     if left(zfs,1) /= '*' then
     Select
     When zsel = 'F' | zsel = 'S' then
@@ -208,6 +211,7 @@
   exit(0)
 
 Get_Usage:
+  if left(m.mnte_fsname.i,1) = '/' then return  /* Ignore /PROC FS */
   statfs m.mnte_fsname.i s.
   if (DATATYPE(S.STFS_BLOCKSIZE) = "NUM") THEN DO             /* @A1 */
     j=s.stfs_total * s.stfs_blocksize
